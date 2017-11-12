@@ -1,0 +1,295 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Wenneker Article
+% LaTeX Template
+% Version 2.0 (28/2/17)
+%
+% This template was downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Authors:
+% Vel (vel@LaTeXTemplates.com)
+% Frits Wenneker
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[10pt, a4paper, twocolumn]{article} % 10pt font size (11 and 12 also possible), A4 paper (letterpaper for US letter) and two column layout (remove for one column)
+
+\input{structure.tex} % Specifies the document structure and loads requires packages
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{Multi-Label Classification} % The article title
+
+\author{
+	\authorstyle{Willie Maddox} % Authors
+%	\authorstyle{Willie Maddox\textsuperscript{1,2,3}} % Authors
+%	\newline\newline % Space before institutions
+%	\textsuperscript{2}\institution{University of Texas at Austin, Texas, United States of America}\\ % Institution 2
+%	\textsuperscript{3}\institution{\texttt{LaTeXTemplates.com}} % Institution 3
+}
+
+% Example of a one line author/institution relationship
+%\author{\newauthor{John Marston} \newinstitution{Universidad Nacional Autónoma de México, Mexico City, Mexico}}
+
+\date{\today} % Add a date here if you would like one to appear underneath the title block, use \today for the current date, leave empty for no date
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Print the title
+
+\thispagestyle{firstpage} % Apply the page style for the first page (no headers and footers)
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+\lettrineabstract{This document serves as the proposal for the final Capstone project for the Machine Learning Engineer Nanodegree offered through Udacity. For this work we will train a model to recognize multiple items in an image. However, unlike traditional classification problems, we will train our models using image datasets with multiple labels per image.  Our goal is to achieve as good as if not better results than popular single-label classification models.}
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+\section{Domain Background}\label{sec:1} % 1 - 2 para
+
+% In this section, provide brief details on the background information of the domain from which the project is proposed. Historical information relevant to the project should be included. It should be clear how or why a problem in the domain can or should be solved. Related academic research should be appropriately cited in this section, including why that research is relevant.  Additionally, a discussion of your personal motivation for investigating a particular problem in the domain is encouraged but not required.
+
+In machine learning, image classification is the problem of deciding to which category a particular image belongs. Much of the previous work for solving image classification problems has been focused on using a single label per image to train a classifier.  For some of the more popular datasets such as ImageNet~\citep{ILSVRC15} and CIFAR-10~\cite{Krizhevsky2009}, each image has associated with it a single label and there are many images per label. This works well for a dataset like MNIST~\cite{mnist} where each instance is a black and white image of a single handwritten digit  between 0 and 9.  But for images that illustrate the real world such as photographs, there is almost never a single contextual topic in the image. For example, Fig.\ref{screw-1924174_640} is a picture of bolts, but there are also nuts, washers and a wooden table.  So in reality this image has (at least) four tags.  The goal of this project is to create a classifier that can be trained using images that have multiple labels per image.
+
+%Pixabay is a website where photographers can publish and share copyright free images and videos.  Since all the contents are released under the CC0 license, they are safe to use without having to ask permission or give credit to the original artist. When a user submits a new image it must first be reviewed by the Pixabay admins.  They look at: 
+
+%\begin{itemize}
+%	\item Copyright and Duplicates
+%	\item Noise and JPEG Compression Artifacts
+%	\item Focus and Blurring
+%	\item Lighting and Colors
+%	\item Tilted and Crooked Images
+%	\item Image Dimensions
+%	\item Image Manipulations
+%	\item Image Hygiene and Composition
+%\end{itemize}
+
+%If the image satisfies the above categories then, most likely, it will be approved~\cite{Pixabay:Tagging}.  This is probably the primary reason Pixabay is so popular among photographers and artists alike; the overall quality of images in the database is professional grade.
+
+% The most well known kinds of classification problems are binary and multiclass classification.  Both of these situations work well for datasets with a single label per image
+
+\begin{figure}
+	\includegraphics[width=\linewidth]{screw-1924174_640.jpg} % Figure image
+	\caption{Nuts n Bolts n Boots n Pants} % Figure caption
+	\label{screw-1924174_640} % Label for referencing with \ref{bear}
+\end{figure}
+
+\section{Problem Statement}\label{sec:2} % 1 para
+
+%In this section, clearly describe the problem that is to be solved. The problem described should be well defined and should have at least one relevant potential solution. Additionally, describe the problem thoroughly such that it is clear that:
+%\begin{description}
+%	\item[Quantifiable] The problem can be expressed in mathematical or logical terms.
+%	\item[Measurable] The problem can be measured by some metric and clearly observed.
+%	\item[Replicable] The problem can be reproduced and occurs more than once. 
+%\end{description}
+
+The problem that we will try to solve is finding multiple features (or labels) in a single image. We would also like to know how much better our trained multi-label classifier is at predicting the top $k$ labels for a given image as compared to a standard single-label classifiers like VGG16~\cite{SimonyanZ14a} trained on ImageNet?
+
+%Along with the image upload, the user must also provide at least 3 tags describing the content of the image.  The average number of tags per image is around 10.  Tags make the image easily searchable by other users.  Pixabay provides a tagging tutorial on their website but in general the tags are not required to meet the same level of quality standards that are placed on a newly uploaded image \citep{Pixabay:ImgStandards}. Nor can they really be enforced.  The metric for measuring the quality of an image is well defined.  All images must have at least 1920 along the long dimension.  The image should be sharp and in focus.  Avoid embedded timestamps.  These are all acceptable forms of objective measurement.  Tags, on the other hand, represent a persons description or interpretation of what is contained in an image and as such they (the tags) are difficult to use as a source of measurement.
+
+%For example, Fig.\ref{screw-1924174_640} looks like \textit{nuts and bolts} to me, but to someone else it might be \textit{hardware} or maybe even \textit{wood}.  Which tags are \textit{correct}?  Well all of them.  The final decision on which labels to use for tagging an image will be up to the owner of the image.  Hence, it is probably not a good idea to use tags as a measure of whether or not an image should or should not be approved.
+
+%Assuming that the user is the original author (or photographer) of the image, then coming up with 3 relevant tags should be trivial.  Authors have first hand knowledge of their own images and can generally be trusted to tag the image correctly.  After all, an image with mislabeled tags is an image that no one will ever find. And since so much effort is required on the part of the author to get an image approved in the first place, it seems highly unlikely that anyone would ever mislabel one of their own images on purpose.  And yet many of the images on pixabay have tags that are incorrect or at least appear to be.
+
+%major tag problem areas:
+
+%\begin{enumerate}
+%	\item Misspelled tags. siberian husky not sibirian husky.
+%	\item Irrelevant tags.
+%	\item Different translations.
+%	\item Incorrect tags. papillon returns lots of butterflies (no papillon tag either)
+%	\item Hyphenated words. mercedes-benz vs mercedes benz, guinea-pig vs guinea pig
+%\end{enumerate}
+
+%Show examples of 2-3 images that have bogus tags.
+
+%When a user is first presented with the tag screen, they are asked to type in tags corresponding to the content of their image.  After they type the first tag, a list of similar words (30 or so) appear for the user to select from. The list is auto-refreshed as new tags are added.  This is a nice convenience that Pixabay provides, but wouldn't it be even nicer to recommend to the user in the first place a list of tags based soley on the content of the image?  
+
+\section{Datasets and Inputs}\label{sec:3} % 2 - 3 para
+
+%In this section, the dataset(s) and/or input(s) being considered for the project should be thoroughly described, such as how they relate to the problem and why they should be used. Information such as how the dataset or input is (was) obtained, and the characteristics of the dataset or input, should be included with relevant references and citations as necessary It should be clear how the dataset(s) or input(s) will be used in the project and whether their use is appropriate given the context of the problem.
+
+For this study we will use the NUS-WIDE\citep{nus-wide-civr09} dataset as our primary dataset. We may consider using the MS-COCO\citep{MSCOCO} dataset as well.  
+%How do the dataset(s) and/or input(s) relate to the problem?
+These datasets contain images with multiple labels per image making them ideal for this kind of study.
+%Why should the dataset(s) and/or input(s) be used?
+They are also large enough that we can use them for training.
+%How is (was) the dataset or input obtained?
+Both datasets are feely downloadable from the internet.  However, we had to explicitly request permission to use and download the image set for the NUS-WIDE dataset.  The authors were happy to grant us permission.
+
+%What are the characteristics of the dataset or input?
+%How will the dataset(s) or input(s) be used in the project?
+The NUS-WIDE dataset contains 269,648 images and 81 labels with 2.4 labels per image on average.  We will use the original train/test split of 161,789 and 107,859. The MS-COCO dataset contains a training set of 82,783 images and a test set of 40,504 images.  However, the test set does not come with ground truth so we will use a subset of the training set for validation and testing. The MS-COCO dataset has 80 labels with 2.9 labels per image on average.  
+%Is it appropriate to use these datasets given the context of the problem?
+Since we will be fine-tuning a model pretrained on ImageNet, these two datasets are good candidates since all their labels are a subset of the original 1000 ImageNet labels.
+
+%For this study we will use a custom Pixabay dataset as our primary dataset.  By custom we mean that we will only choose images with tags related to the 1000 classes in Imagenet.  We will also supplement our primary dataset with a secondary dataset consisting of both single-label and multi-label image datasets.  For single-label we will use Imagenet CLS-LOC\citep{ILSVRC15} dataset and for multi-label we will use the Imagenet DET\citep{ILSVRC15}, MSCOCO\citep{MSCOCO} and NUS-WIDE\citep{nus-wide-civr09} datasets.  These secondary datasets are very organized; they come with verified ground truth and can be easily downloaded and extracted for immediate use.  Data from Pixabay does not come prepackaged.  You must submit multiple search queries to build up your own database.  Fortunately they provide an API for registered users\citep{Pixabay:API}. The Pixabay API is well documented and it's usage is relatively straight forward.  At the minimum you need to pass it an API key for authentication and a query string of labels to search.  For example, to retrieve web format photos about "yellow flowers", the query string $q$ needs to be URL encoded\footnote{The key used in the url is invalid so don't expect it to work.  The url is meant to illustrate the basic structure of a request.}. \href{}{\nolinkurl{https://pixabay.com/api/?key=1234567-a1b2c3d4e5f6g7h8i9j0k1l2m&q=yellow+flowers&image_type=photo}}. The response for this request is a JSON encoded data structure containing metadata for a list of images.
+
+%\begin{code}
+%%\captionof{listing}{Pixabay API JSON response}
+%\caption{Pixabay API JSON response}
+%\label{snip:api-response}
+%\begin{minted}[bgcolor=bg]{json}
+%{
+%"total": 19177,
+%"totalHits": 500,
+%"hits": [
+%  {
+%    "id":2895728,
+%    "pageURL": ...,
+%    "type":"photo",
+%    "tags":"flower, pink, yellow",
+%    "previewURL": ...,
+%    "previewWidth":150,
+%    "previewHeight":112,
+%    "webformatURL": ...,
+%    "webformatWidth":640,
+%    "webformatHeight":480,
+%    "imageWidth":4608,
+%    "imageHeight":3456,
+%    "views":56,
+%    "downloads":25,
+%    "favorites":1,
+%    "likes":4,
+%    "comments":5,
+%    "user_id":5394567,
+%    "user":"GeorgeB2",
+%    "userImageURL": ...,
+%  },
+%  {
+%    "id": 195893,
+%    "tags": "blossom, bloom, flower",
+%    "webformatURL": ...,
+%    "..."
+%  },
+%  "..."
+%]
+%}
+%\end{minted}
+%\end{code}
+%\vspace{1mm}
+
+%A sample of the API response is shown in Snippet \ref{snip:api-response}.  There are three top level parameters: The \fcolorbox{white}{bg}{\textcolor{ForestGreen}{"total"}} number of images in the Pixabay database with tags matching the query, the maximum \fcolorbox{white}{bg}{\textcolor{ForestGreen}{"totalHits"}} that can be retrieved with the present query, and the actual \fcolorbox{white}{bg}{\textcolor{ForestGreen}{"hits"}} which are a list of python dictionaries, each containing metadata about a specific image in the database.  For our purposes, we only need a subset of this metadata:  A url to fetch the image, the set of labels that describe the image, and a mapping to help us keep track of which set of labels goes with each image.  Each "hit" contains a url for a low, medium, and high resolution version of an image. We choose the medium sized image \fcolorbox{white}{bg}{\textcolor{ForestGreen}{"webformatURL"}}. Since most pretrained models use images with dimensions between 200 and 300 pixels as input, this is an appropriate choice. As we can see in the code block, the \fcolorbox{white}{bg}{\textcolor{ForestGreen}{"tags"}} represent the labels for the image.  We will store the \fcolorbox{white}{bg}{\textcolor{ForestGreen}{"tags"}} in a dictionary using the \fcolorbox{white}{bg}{\textcolor{ForestGreen}{"id"}} as the key since they are unique across images. Each downloaded image will be saved using \fcolorbox{white}{bg}{\textcolor{ForestGreen}{"id"}} as the base of the file name.  So for the example above we will have 2895728.jpg and 195893.jpg.  This will make it easy to determine which image goes with which tags and vice versa.
+
+%The details (usage, directory layout, data formats, etc.) of the other datasets are available online and will not be discussed here.  However, it is worth mentioning how each of the datasets will be merged together. The syntax rules for labels depend on the dataset and are generally incompatable across datasets.  Some datasets capatilize proper nouns, some do not (Chihuahua vs chihuahua). Some use spaces to separate multi-word labels, others use underscores (golden retriever vs golden\_retriever). Some use alternate spellings (airplane vs aeroplane).  Before we can merge the above databases together into a complete database we will first need to decide on our own set of rules for labels.
+
+\section{Solution Statement}\label{sec:4} % 1 para
+
+%In this section, clearly describe a solution to the problem. The solution should be applicable to the project domain and appropriate for the dataset(s) or input(s) given. Additionally, describe the solution thoroughly such that it is clear that the solution is 
+
+%\begin{description}
+%	\item[Quantifiable] The solution can be expressed in mathematical or logical terms.
+%	\item[Measurable] The solution can be measured by some metric and clearly observed.
+%	\item[Replicable] The solution can be reproduced and occurs more than once.
+%\end{description}
+
+The solution is to train a model that is capable of generating (or recommending) a finite set of labels based soley on an input image.  We will use transfer learning to fine-tune a pre-existing model based on the labels from our datasets.  We will measure the performance of our model by comparing the top 3 predicted labels from our model against the known ground truth labels for each of our images\footnote{since both datasets have $\approx$ 3 labels per image on average, $k = 3$ seems appropriate}.  The specific metrics used are discussed in the following sections. We set aside a subset of our training data which will be used exclusively for testing. We will use the Keras python package (with the TensorFlow backend) to create our neural nets and we will train them using a single Nvidia 1080 Ti GPU.
+
+\section{Benchmark Model\label{sec:5}} % 1 - 2 para
+
+% In this section, provide the details for a benchmark model or result that relates to the domain, problem statement, and intended solution. Ideally, the benchmark model or result contextualizes existing methods or known information in the domain and problem given, which could then be objectively compared to the solution. Describe how the benchmark model or result is measurable (can be measured by some metric and clearly observed) with thorough detail.
+
+To benchmark the solution above, we will compare the testing set against two existing models.  The first model will simply be the original VGG16 model pretrained on ImageNet\footnote{\url{https://keras.io/applications/}} (Just the base ImageNet model with 1000 classes. No fine tuning.) Since we will be using this same base model for transfer learning, we should expect our model to perform better at classifing single-label images from the 81 category NUS-WIDE label set.
+
+For the second model, we will use Clarifai's image recognition API\footnote{\url{https://www.clarifai.com/}}.  Clarifai’s image recognition systems recognize various categories, objects, and tags in images, as well as find similar images. The company’s image recognition systems also allow its users to find similar images in large uncategorized repositories using a combination of semantic and visual similarities.  
+
+We will use the evaluation metrics below to quantify how well our model does against state-of-the-art models. These models include KNN~\cite{nus-wide-civr09}, WARP~\cite{GongJLTI13}, CNN-RNN~\cite{WangYMHHX16}, and ResNet-SRN~\cite{ZhuLOYW17}.
+
+
+%The third benchmark model, Akiwi, is a semi-automatic image tagging system able to suggest keywords for uploaded images with minimal user input\footnote{\url{http://www.akiwi.eu/}}.  Akiwi does not offer a public API, instead you must drag and drop images in one at a time. We will most likely not run the entire testing set through this benchmark, but rather use it to study edge cases and outliers. It will be interesting to see how well our model compares to these state-of-the-art systems.
+
+% J. Hartmann, N. Hezel, M. Krause and A. Sonnenberg under the supervision of Prof. Kai Uwe Barthel
+% https://visual-computing.com/
+
+\section{Evaluation Metrics\label{sec:6}} % 1 - 2 para
+
+% In this section, propose at least one evaluation metric that can be used to quantify the performance of both the benchmark model and the solution model. The evaluation metric(s) you propose should be appropriate given the context of the data, the problem statement, and the intended solution. Describe how the evaluation metric(s) are derived and provide an example of their mathematical representations (if applicable). Complex evaluation metrics should be clearly defined and quantifiable (can be expressed in mathematical or logical terms).
+
+After reading through previous literature on multi-label classification, we found that there are quite a few metrics appropriate for this problem. The mean average precision (mAP) is a widely used metric for comparing between trained models and has been regarded as the best metric for classification problems~\cite{Lavrenko_2014}.  Other popular metrics include precision, recall, $F_1$ score, Jaccard index, 0/1 loss and Hamming loss~\cite{Tsoumakas:2007,SOKOLOVA2009427,Herrera:2016}. At this point, though, it is unclear which of these metrics will provide the best insight for our results.
+
+%\begin{equation}
+%\mathrm{IOU} = \frac{1}{N}\sum_{i=1}^{N}\frac{\vert y^i \wedge \hat{y} \vert}{\vert y^i \vee \hat{y} \vert}, \label{eq:IOU}
+%\end{equation}
+
+\section{Project Design\label{sec:7}} % 1 page
+
+% In this final section, summarize a theoretical workflow for approaching a solution given the problem. Provide thorough discussion for what strategies you may consider employing, what analysis of the data might be required before being used, or which algorithms will be considered for your implementation. The workflow and discussion that you provide should align with the qualities of the previous sections. Additionally, you are encouraged to include small visualizations, pseudocode, or diagrams to aid in describing the project design, but it is not required. The discussion should clearly outline your intended workflow of the capstone project.
+
+The tenative schedule for solving the given problem will go as follows. First we will read the datasets and split them into training/validation/testing subsets.  Each image will need to be resized and pixel values scaled to a range between 0 and 1. We will either create one model out of both datasets or two models, one for each dataset.
+
+Next we will set up our neural network. Since training is expensive we will implement transfer learning to leverage the pretrained weights of a preexisting model.  We will use the VGG16 model pretrained on ImageNet.  This model is provided to us through the Keras codebase.  When we load the model, we will leave off the 3 fully-connected (fc) layers at the top of the network.  This will serve as our base model for the entire project.  We will run the base model on each input (\textit{i.e.} image) in our dataset and create a set of bottleneck features from the resulting predictions.
+
+We will then use these bottleneck features to train a small fc model which will later be attached to our base model.  The number of layers and the number of neurons per layer will be hyperparameters that we will explore, but we will start out with a simple fc network as shown in Table~\ref{tab:top_model}.
+\begin{table}
+\centering
+\caption{Initial configuration of our proposed top neural network model. The fc's are the fully-connected layers and the ReLU is a rectified linear unit activation layer. In the output shape, "None" is just a placeholder for the batch size.  For a model trained on the  Pascal VOC data, the final 2 layers would become (None, 80)}
+\label{tab:top_model}
+\begin{tabular}{ll}
+%\toprule
+\hline
+Layer Type & Output Shape \\
+%\midrule
+\hline
+fc      & (None, 1024) \\
+ReLU    & (None, 1024) \\
+dropout & (None, 1024) \\
+fc      & (None, 81)   \\
+sigmoid & (None, 81)   \\
+%\bottomrule
+\hline
+\end{tabular}
+\end{table}
+For multi-\textit{class} classification problems it is common to use a softmax layer for the final output layer. This forces the loss function to place bias on a single label during the backpropogation phase.  Since our problem is a multi-\textit{label} classification problem, we do not want to give a preference to any particular (ground truth) label since we are treating them equally.  For this reason, we will use a standard sigmoid layer is our final output classifier.  For the loss function we will use binary cross entropy and for backpropogation we will use rmsprop to update the weights.  After training this small fc model, we will attach it to the top of the base model and this will serve as our main model. 
+
+Now that we have our main model we can fine-tune the entire network.  For this, we will again use binary cross entropy for the loss function, but since we're fine-tuning, we want to use a slow learning rate so that we do not overfit.  For this we will use stochastic gradient descent with a 1e-4 learning rate and 0.9 momentum. We will also freeze most of the bottom layers of the base model so that training can go faster.  The number of layers at the end of the base layer that we will leave unfrozen will be a hyperparameter for us to explore.
+
+Training this final model will be significantly slower than training the bottleneck features, especially if we decide to unfreeze some of the top convolutional layers from the base model.  This is because file input/output between CPU and GPU is a computational bottleneck.  To help speed things up, we will process images from our training set in batches.  The size of each batch is also a hyperparameter, but will most likely be 32, 64, 128, or some other power of 2. For each batch, we will augment the images using a number of random transformations (i.e. zoom, rotation, horizontal flip, noise, etc.).  This will ensure that our model never sees the same image twice. After each epoch, we will calculate the loss and accuracy of the model using the validation set.  This will allow us to detect if our model is overfitting.  In addition, we will check if the validation loss is less than the validation loss from the previous epoch and if so, we will create a checkpoint by saving the weights to a file.
+
+Once the model is trained we will run predictions on our holdout test set using the metrics listed in Section~\ref{sec:6} and compare them to those currently found in the literature.  We will also compare our results to the benchmark models described in Section~\ref{sec:5}.
+
+%Too compensate for class imbalance, We will use stratification to construct the $k-fold$ cross validation subsets\citep{Kohavi_1995_1137, Sechidis2011}.
+
+%\begin{enumerate}
+%	\item How many images per category are there in Imagenet. (between 732 and 1300 per synset)
+%	\item How many nouns (or physical entities) are there in WordNet.
+%	\item How many hypernyms classes are there in Imagenet. 
+%	\item How many hyponyms per hypernym are there in Imagenet.
+%	\item What about holonyms and meronyms. Can they be of any use with this problem?
+%\end{enumerate}
+
+%Because the images are of such high quality on Pixabay they make great specimens for training on CNN's.
+
+%\begin{itemize}
+%	\item Tokenization
+%	\item Tagging - Nouns only
+%	\item Stemming
+%	\item Lemmatization
+%	\item Lexical semantics: synonym, antonym, hypernym, hyponym, meronym, holonym
+%	\item StopWord removal
+%\end{itemize}
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\bibliography{example}
+%\printbibliography[title={Bibliography}] % Print the bibliography, section title in curly brackets
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
