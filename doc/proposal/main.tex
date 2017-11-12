@@ -64,7 +64,7 @@
 
 % In this section, provide brief details on the background information of the domain from which the project is proposed. Historical information relevant to the project should be included. It should be clear how or why a problem in the domain can or should be solved. Related academic research should be appropriately cited in this section, including why that research is relevant.  Additionally, a discussion of your personal motivation for investigating a particular problem in the domain is encouraged but not required.
 
-In machine learning, image classification is the problem of deciding to which category a particular image belongs. Much of the previous work for solving image classification problems has been focused on using a single label per image to train a classifier.  For some of the more popular datasets such as ImageNet~\citep{ILSVRC15} and CIFAR-10~\cite{Krizhevsky2009}, each image has associated with it a single label and there are many images per label. This works well for a dataset like MNIST~\cite{mnist} where each instance is a black and white image of a single handwritten digit  between 0 and 9.  But for images that illustrate the real world such as photographs, there is almost never a single contextual topic in the image. For example, Fig.\ref{screw-1924174_640} is a picture of bolts, but there are also nuts, washers and a wooden table.  So in reality this image has (at least) four tags.  The goal of this project is to create a classifier that can be trained using images that have multiple labels per image.
+In machine learning, image classification is the problem of deciding to which category a particular image belongs. Much of the previous work for solving image classification problems has been focused on using a single label per image to train a classifier.  For some of the more popular datasets such as ImageNet~\cite{ILSVRC15} and CIFAR-10~\cite{Krizhevsky2009}, each image has associated with it a single label and there are many images per label. This works well for a dataset like MNIST~\cite{mnist} where each instance is a black and white image of a single handwritten digit  between 0 and 9.  But for images that illustrate the real world such as photographs, there is almost never a single contextual topic in the image. For example, Fig.\ref{screw-1924174_640} is a picture of bolts, but there are also nuts, washers and a wooden table.  So in reality this image has (at least) four tags.  The goal of this project is to create a classifier that can be trained using images that have multiple labels per image.
 
 %Pixabay is a website where photographers can publish and share copyright free images and videos.  Since all the contents are released under the CC0 license, they are safe to use without having to ask permission or give credit to the original artist. When a user submits a new image it must first be reviewed by the Pixabay admins.  They look at: 
 
@@ -85,11 +85,11 @@ In machine learning, image classification is the problem of deciding to which ca
 
 \begin{figure}
 	\includegraphics[width=\linewidth]{screw-1924174_640.jpg} % Figure image
-	\caption{Nuts n Bolts n Boots n Pants} % Figure caption
+	\caption{Nuts n Bolts} % Figure caption
 	\label{screw-1924174_640} % Label for referencing with \ref{bear}
 \end{figure}
 
-\section{Problem Statement}\label{sec:2} % 1 para
+\section{Problem Statement} % 1 para
 
 %In this section, clearly describe the problem that is to be solved. The problem described should be well defined and should have at least one relevant potential solution. Additionally, describe the problem thoroughly such that it is clear that:
 %\begin{description}
