@@ -134,7 +134,7 @@ Both datasets are feely downloadable from the internet.  However, we had to expl
 
 %What are the characteristics of the dataset or input?
 %How will the dataset(s) or input(s) be used in the project?
-The NUS-WIDE dataset contains 269,648 images and 81 labels with 2.4 labels per image on average.  We will use the original train/test split of 161,789 and 107,859. The MS-COCO dataset contains a training set of 82,783 images and a test set of 40,504 images.  However, the test set does not come with ground truth so we will use a subset of the training set for validation and testing. The MS-COCO dataset has 80 labels with 2.9 labels per image on average.  
+The NUS-WIDE dataset contains 269,648 images and 81 labels with 2.4 labels per image on average.  The images vary in size (height and width values fall within the range between about 150 pixels to 250 pixels) and shape (portrait and landscape) and all have 3 color channels. We will use the original train/test split of 161,789 and 107,859. The MS-COCO dataset contains a training set of 82,783 images and a test set of 40,504 images.  However, the test set does not come with ground truth so we will use a subset of the training set for validation and testing. The MS-COCO dataset has 80 labels with 2.9 labels per image on average.  
 %Is it appropriate to use these datasets given the context of the problem?
 Since we will be fine-tuning a model pretrained on ImageNet, these two datasets are good candidates since all their labels are a subset of the original 1000 ImageNet labels.
 
@@ -198,13 +198,13 @@ Since we will be fine-tuning a model pretrained on ImageNet, these two datasets 
 %	\item[Replicable] The solution can be reproduced and occurs more than once.
 %\end{description}
 
-The solution is to train a model that is capable of generating (or recommending) a finite set of labels based soley on an input image.  We will use transfer learning to fine-tune a pre-existing model based on the labels from our datasets.  We will measure the performance of our model by comparing the top 3 predicted labels from our model against the known ground truth labels for each of our images\footnote{since both datasets have $\approx$ 3 labels per image on average, $k = 3$ seems appropriate}.  The specific metrics used are discussed in the following sections. We set aside a subset of our training data which will be used exclusively for testing. We will use the Keras python package (with the TensorFlow backend) to create our neural nets and we will train them using a single Nvidia 1080 Ti GPU.
+The solution is to train a model that is capable of generating (or recommending) a finite set of labels based soley on an input image.  For the training we will explore a few algorithms.  We will compare between different back propogation optimizers such as rmsprop, Adam and SGD.  We will use transfer learning to fine-tune a pre-existing model based on the labels from our datasets.  We will measure the performance of our model by comparing the top 3 predicted labels from our model against the known ground truth labels for each of our images\footnote{since both datasets have $\approx$ 3 labels per image on average, $k = 3$ seems appropriate}.  The specific metrics used are discussed in the following sections. We set aside a subset of our training data which will be used exclusively for testing. We will use the Keras python package (with the TensorFlow backend) to create our neural nets and we will train them using a single Nvidia 1080 Ti GPU.
 
 \section{Benchmark Model\label{sec:5}} % 1 - 2 para
 
 % In this section, provide the details for a benchmark model or result that relates to the domain, problem statement, and intended solution. Ideally, the benchmark model or result contextualizes existing methods or known information in the domain and problem given, which could then be objectively compared to the solution. Describe how the benchmark model or result is measurable (can be measured by some metric and clearly observed) with thorough detail.
 
-To benchmark the solution above, we will compare the testing set against two existing models.  The first model will simply be the original VGG16 model pretrained on ImageNet\footnote{\url{https://keras.io/applications/}} (Just the base ImageNet model with 1000 classes. No fine tuning.) Since we will be using this same base model for transfer learning, we should expect our model to perform better at classifing single-label images from the 81 category NUS-WIDE label set.
+To benchmark the solution above, we will compare the testing set against the original VGG16 model pretrained on ImageNet\footnote{\url{https://keras.io/applications/}} (Just the vanilla VGG16 model with 1000 classes. No fine tuning.) This will be our primary benchmark model. Since we will be using this same base model for transfer learning, we should expect our model to perform better at classifing single-label images from the 81 category NUS-WIDE label set.
 
 For the second model, we will use Clarifai's image recognition API\footnote{\url{https://www.clarifai.com/}}.  Clarifai’s image recognition systems recognize various categories, objects, and tags in images, as well as find similar images. The company’s image recognition systems also allow its users to find similar images in large uncategorized repositories using a combination of semantic and visual similarities.  
 
@@ -287,7 +287,7 @@ Once the model is trained we will run predictions on our holdout test set using 
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
 
-\bibliography{example}
+\bibliography{../example}
 %\printbibliography[title={Bibliography}] % Print the bibliography, section title in curly brackets
 
 %----------------------------------------------------------------------------------------
