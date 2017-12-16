@@ -859,7 +859,7 @@ Classifiers such as AlexNet and VGGNet which are typically trained on single cla
 The problem that we will try to solve is finding multiple features (or labels) in a single image. We would also like to know how much better our trained multi-label classifier is at predicting the top $k$ labels for a given image as compared to a standard single-label classifiers like VGG16~\cite{SimonyanZ14a} trained on ImageNet? Can we train a classifier using multi-labelled image data to perform at least as well as existing models trained on single-class image data.  A model trained on multi-labelled image data should, in theory, require fewer data samples since more information per image is avaliable to training. Is this also true?  Let's find out.
 
 
-\subsection{Metrics}
+\subsection{Metrics}\label{sec:metrics}
 %In this section, you will need to clearly define the metrics or calculations you will use to measure performance of a model or result in your project. These calculations and metrics should be justified based on the characteristics of the problem and problem domain. Questions to ask yourself when writing this section:
 
 %Are the metrics you’ve chosen to measure the performance of your models clearly discussed and defined?
@@ -868,7 +868,7 @@ The problem that we will try to solve is finding multiple features (or labels) i
 
 After reading through previous literature on multi-label classification, we found that there are quite a few metrics appropriate for this problem. The mean average precision (mAP) is a widely used metric for comparing between trained models and has been regarded as the best metric for classification problems~\cite{Lavrenko_2014}.  Other popular metrics include precision, recall, $F_1$ score, Jaccard index, 0/1 loss and Hamming loss~\cite{Tsoumakas:2007,SOKOLOVA2009427,Herrera:2016}. 
 
-For multilabel classification, particularly, the precision, recall, and $F_1$ score have three different variants which we will use.~\cite{MADJAROV20123084,WuZ16,Koyejo:2015}  \textit{Macro-averaging} measures the average classification performance across labels.  
+For multilabel classification, particularly, the precision, recall, and $F_1$ score have three different variants which we will use~\cite{MADJAROV20123084,WuZ16,Koyejo:2015,GongJLTI13}. \textit{Macro-averaging} measures the average classification performance across labels.  
 
 \begin{equation}
 \mathrm{MP} = \frac{1}{L}\sum_{j=1}^{L}\frac{\sum_{i=1}^{N}y_{ij}\hat{y}_{ij}}{\sum_{i=1}^{N}y_{ij}}
@@ -982,168 +982,229 @@ When comparing our model to the benchmark models, we will use Eqns~\ref{eq:MP} t
 
 \section{Analysis} % approx. 2-4 pages
 \subsection{Data Exploration}
-In this section, you will be expected to analyze the data you are using for the problem. This data can either be in the form of a dataset (or datasets), input data (or input files), or even an environment. The type of data should be thoroughly described and, if possible, have basic statistics and information presented (such as discussion of input features or defining characteristics about the input or environment). Any abnormalities or interesting qualities about the data that may need to be addressed have been identified (such as features that need to be transformed or the possibility of outliers). Questions to ask yourself when writing this section:
+%In this section, you will be expected to analyze the data you are using for the problem. This data can either be in the form of a dataset (or datasets), input data (or input files), or even an environment. The type of data should be thoroughly described and, if possible, have basic statistics and information presented (such as discussion of input features or defining characteristics about the input or environment). Any abnormalities or interesting qualities about the data that may need to be addressed have been identified (such as features that need to be transformed or the possibility of outliers). Questions to ask yourself when writing this section:
 
-We use the MS-COCO\cite{MSCOCO} dataset as our primary dataset.
-We use the NUS-WIDE\cite{nus-wide-civr09} dataset as our secondary dataset.
+%We use the NUS-WIDE\cite{nus-wide-civr09} dataset as our secondary dataset.
 
-If a dataset is present for this problem, have you thoroughly discussed certain features about the dataset? 
+%If a dataset is present for this problem, have you thoroughly discussed certain features about the dataset? 
 
-Has a data sample been provided to the reader?
+%Has a data sample been provided to the reader?
 
-If a dataset is present for this problem, are statistics about the dataset calculated and reported? 
+%If a dataset is present for this problem, are statistics about the dataset calculated and reported? 
 
-Have any relevant results from this calculation been discussed?
+%Have any relevant results from this calculation been discussed?
 
-If a dataset is **not** present for this problem, has discussion been made about the input space or input data for your problem?
+%If a dataset is **not** present for this problem, has discussion been made about the input space or input data for your problem?
 
-Are there any abnormalities or characteristics about the input space or dataset that need to be addressed? (categorical variables, missing values, outliers, etc.)
+%Are there any abnormalities or characteristics about the input space or dataset that need to be addressed? (categorical variables, missing values, outliers, etc.)
 
- images in Lite train, valid, test, dataset have missing tags.
-test
-before (13904, 224, 224, 3) (13904, 81)
-after  (13160, 224, 224, 3) (13160, 81)
+
+For this study we will use the (2017) MS-COCO\cite{MSCOCO} dataset as our primary dataset. The COCO dataset is freely downloadable from the internet and contains images with multiple labels per image making them ideal for this kind of study. The COCO dataset contains a training set of 118,287 images and a validation set of 5,000 images.  The images are colored and the size of each image is about 600 * 400 pixels.  The MS-COCO dataset has 80 labels with 2.9 labels per image on average.  However, both training and validation sets have images with no labels.  This is not so much a problem for training as it is for testing.  Specifically, when we evaluate our predictions using the metrics from Section~\ref{sec:metrics}, empty labeled samples could lead to divide by zero errors.  Hence, we will only use labelled samples for testing. 
+
+%They are also large enough that we can use them for training.
+
+%Both datasets are feely downloadable from the internet.  However, we had to explicitly request permission to use and download the image set for the NUS-WIDE dataset.  The authors were happy to grant us permission.
+
+%The NUS-WIDE dataset contains 269,648 images and 81 labels with 2.4 labels per image on average.  The images vary in size (height and width values fall within the range between about 150 pixels to 250 pixels) and shape (portrait and landscape) and all have 3 color channels. We will use the original train/test split of 161,789 and 107,859. 
+
+%Since we will be fine-tuning a model pretrained on ImageNet, these two datasets are good candidates since all their labels are a subset of the original 1000 ImageNet labels.
+
+%coco
+%        train, valid
+%2017   118287,  5000
+%2015
+%2014
+
+%nus-wide
+%         train ,   test
+%Object   17928 ,  12072
+%Scene    17463 ,  17463
+%Lite     27807 ,  27808
+%All     161789 , 107859
+
+
+%images in Lite train, valid, test, dataset have missing tags.
+%test
+%before (13904, 224, 224, 3) (13904, 81)
+%after  (13160, 224, 224, 3) (13160, 81)
 
 %TrainTestLabels/Labels_lake_Train.txt line 78373 value = -1130179
 
-All
-\begin{table}
-\begin{tabular}{rrrr}
-\toprule
-{} &   test &  train &  valid \\
-\midrule
-0  &  12006 &  36340 &  11955 \\
-1  &  15780 &  47571 &  15865 \\
-2  &  10531 &  31614 &  10499 \\
-3  &   6652 &  19747 &   6665 \\
-4  &   4151 &  12304 &   4149 \\
-5  &   2429 &   7283 &   2495 \\
-6  &   1374 &   3989 &   1360 \\
-7  &    667 &   1969 &    627 \\
-8  &    250 &    730 &    233 \\
-9  &     70 &    190 &     63 \\
-10 &     15 &     46 &     15 \\
-11 &      4 &      3 &      3 \\
-12 &      0 &      2 &      0 \\
-13 &      1 &      0 &      0 \\
-\bottomrule
-\end{tabular}
-\end{table}
+%All
+%\begin{table}
+%\begin{tabular}{rrrr}
+%\toprule
+%{} &   test &  train &  valid \\
+%\midrule
+%0  &  12006 &  36340 &  11955 \\
+%1  &  15780 &  47571 &  15865 \\
+%2  &  10531 &  31614 &  10499 \\
+%3  &   6652 &  19747 &   6665 \\
+%4  &   4151 &  12304 &   4149 \\
+%5  &   2429 &   7283 &   2495 \\
+%6  &   1374 &   3989 &   1360 \\
+%7  &    667 &   1969 &    627 \\
+%8  &    250 &    730 &    233 \\
+%9  &     70 &    190 &     63 \\
+%10 &     15 &     46 &     15 \\
+%11 &      4 &      3 &      3 \\
+%12 &      0 &      2 &      0 \\
+%13 &      1 &      0 &      0 \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
 
-Lite
-\begin{table}
-\begin{tabular}{rrrr}
-\toprule
-{} &  test &  train &  valid \\
-\midrule
-0  &   744 &   1474 &    771 \\
-1  &   963 &   1971 &    996 \\
-2  &   685 &   1292 &    709 \\
-3  &   414 &    742 &    431 \\
-4  &  5109 &  10344 &   5152 \\
-5  &  3092 &   6143 &   2972 \\
-6  &  1680 &   3385 &   1658 \\
-7  &   819 &   1632 &    812 \\
-8  &   296 &    617 &    300 \\
-9  &    82 &    161 &     80 \\
-10 &    15 &     40 &     21 \\
-11 &     5 &      3 &      2 \\
-12 &     0 &      2 &      0 \\
-13 &     0 &      1 &      0 \\
-\bottomrule
-\end{tabular}
-\end{table}
+%Lite
+%\begin{table}
+%\begin{tabular}{rrrr}
+%\toprule
+%{} &  test &  train &  valid \\
+%\midrule
+%0  &   744 &   1474 &    771 \\
+%1  &   963 &   1971 &    996 \\
+%2  &   685 &   1292 &    709 \\
+%3  &   414 &    742 &    431 \\
+%4  &  5109 &  10344 &   5152 \\
+%5  &  3092 &   6143 &   2972 \\
+%6  &  1680 &   3385 &   1658 \\
+%7  &   819 &   1632 &    812 \\
+%8  &   296 &    617 &    300 \\
+%9  &    82 &    161 &     80 \\
+%10 &    15 &     40 &     21 \\
+%11 &     5 &      3 &      2 \\
+%12 &     0 &      2 &      0 \\
+%13 &     0 &      1 &      0 \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
 
-Object
-\begin{table}
-\begin{tabular}{rrrr}
-\toprule
-{} &  test &  train &  valid \\
-\midrule
-0 &     0 &      0 &      0 \\
-1 &  4861 &  14270 &   4822 \\
-2 &  1135 &   3535 &   1171 \\
-3 &    40 &    122 &     42 \\
-4 &     0 &      1 &      1 \\
-\bottomrule
-\end{tabular}
-\end{table}
+%Object
+%\begin{table}
+%\begin{tabular}{rrrr}
+%\toprule
+%{} &  test &  train &  valid \\
+%\midrule
+%0 &     0 &      0 &      0 \\
+%1 &  4861 &  14270 &   4822 \\
+%2 &  1135 &   3535 &   1171 \\
+%3 &    40 &    122 &     42 \\
+%4 &     0 &      1 &      1 \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
 
-Scene
-\begin{table}
-\begin{tabular}{rrrr}
-\toprule
-{} &  test &  train &  valid \\
-\midrule
-0  &   396 &    877 &    427 \\
-1  &   985 &   2073 &   1037 \\
-2  &  1835 &   3530 &   1721 \\
-3  &  1811 &   3680 &   1790 \\
-4  &  1455 &   2892 &   1474 \\
-5  &  1108 &   2271 &   1164 \\
-6  &   719 &   1328 &    711 \\
-7  &   328 &    594 &    302 \\
-8  &    74 &    175 &     90 \\
-9  &    16 &     38 &     14 \\
-10 &     5 &      4 &      0 \\
-11 &     0 &      1 &      1 \\
-\bottomrule
-\end{tabular}
-\end{table}
+%Scene
+%\begin{table}
+%\begin{tabular}{rrrr}
+%\toprule
+%{} &  test &  train &  valid \\
+%\midrule
+%0  &   396 &    877 &    427 \\
+%1  &   985 &   2073 &   1037 \\
+%2  &  1835 &   3530 &   1721 \\
+%3  &  1811 &   3680 &   1790 \\
+%4  &  1455 &   2892 &   1474 \\
+%5  &  1108 &   2271 &   1164 \\
+%6  &   719 &   1328 &    711 \\
+%7  &   328 &    594 &    302 \\
+%8  &    74 &    175 &     90 \\
+%9  &    16 &     38 &     14 \\
+%10 &     5 &      4 &      0 \\
+%11 &     0 &      1 &      1 \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
 
 
 \subsection{Exploratory Visualization}
-In this section, you will need to provide some form of visualization that summarizes or extracts a relevant characteristic or feature about the data. The visualization should adequately support the data being used. Discuss why this visualization was chosen and how it is relevant. Questions to ask yourself when writing this section:
+%In this section, you will need to provide some form of visualization that summarizes or extracts a relevant characteristic or feature about the data. The visualization should adequately support the data being used. Discuss why this visualization was chosen and how it is relevant. Questions to ask yourself when writing this section:
 
-Have you visualized a relevant characteristic or feature about the dataset or input data?
+%Have you visualized a relevant characteristic or feature about the dataset or input data?
 
-Is the visualization thoroughly analyzed and discussed?
+%Is the visualization thoroughly analyzed and discussed?
 
-If a plot is provided, are the axes, title, and datum clearly defined?
+%If a plot is provided, are the axes, title, and datum clearly defined?
 
+In Fig.~\ref{coco_label_counts}, we can see that the dominating class label is \textit{person} with 64115 occurances in the training set and 2693 in the validation set. The least dominating class labels are the \textit{toaster} and \textit{hair drier} with 217 and 189 in the training set and 8 and 9 in the validation set, respectively.
+\begin{figure*}[!t]
+\normalsize
+\includegraphics[width=\linewidth]{mscoco_label_counts.png}
+\caption{Number of samples containing at least one instance of a label.}
+\label{coco_label_counts}
+\vspace*{4pt}
+\end{figure*}
+In Fig.~\ref{coco_n_images_with_k_tags}, we show the number of unique tags per sample.  The majority of the samples have at least 1 to 4 unique labels with 2 unique labels being the most dominate.  We also notice that the training and testing sets have 1021 and 48 samples with no labels. We will keep this fact in mind when running our evaluation metrics.
+\begin{figure*}[!t]
+\normalsize
+\includegraphics[width=\linewidth]{mscoco_n_images_with_k_tags.png}
+\caption{Number of unique labels per sample.}
+\label{coco_n_images_with_k_tags}
+\vspace*{4pt}
+\end{figure*}
+In both figures, the training set has 20 to 30 times more samples per label than the validation set and the ratios between the training and validation sets are consistent (i.e. the heights of the train and valid bars are about the same.)
 
-\subsection{Algorithms and Techniques}
-In this section, you will need to discuss the algorithms and techniques you intend to use for solving the problem. You should justify the use of each one based on the characteristics of the problem and the problem domain. Questions to ask yourself when writing this section:
+\subsection{Algorithms and Techniques}\label{sec:algo}
+%In this section, you will need to discuss the algorithms and techniques you intend to use for solving the problem. You should justify the use of each one based on the characteristics of the problem and the problem domain. Questions to ask yourself when writing this section:
 
-Are the algorithms you will use, including any default variables/parameters in the project clearly defined?
+%Are the algorithms you will use, including any default variables/parameters in the project clearly defined?
 
-Are the techniques to be used thoroughly discussed and justified?
+%Are the techniques to be used thoroughly discussed and justified?
 
-Is it made clear how the input data or datasets will be handled by the algorithms and techniques chosen?
+%Is it made clear how the input data or datasets will be handled by the algorithms and techniques chosen?
+
+To solve this problem, we will model our classifier using a deep convolutional neural net.  We will not train our model from scratch, but rather we will perform transfer learning using the VGG16 convnet trained on imagenet.  We will read the images from disk and perform data augmentation using worker threads.  This will make it so the GPU doesn't have to wait on batches thereby maximizing our training efficiency. The final output of the trained model will be a sigmoid layer.  We will use binary cross entropy for our loss function~\cite{deBoer2005} and mini-batch stochastic gradient descent with momentum for backpropogation. Table~\ref{tab:hyperparams} outlines the hyperparameters that will be tuned to optimize the classifier.
+\begin{table}
+\label{tab:hyperparams}
+\caption{List of hyperparameters to tune to optimize the classifier.  Stage 1 is the image preprocessing stage. inet: use a global scaling factor, zmuv: use per-image zero-mean unit-variance.  Stage 2 is where the top model gets trained with bottleneck features. BN stands for Batch Normalization. We train the entire model (base + top) in Stage 3.  Please refer to Sec.~\ref{sec:method} for more details.}
+\begin{tabular}{lll}
+%\centering
+%\toprule
+\hline
+Stage & Hyper-parameter & Variants \\
+%\midrule
+\hline
+1 & Image Preprocessing & inet, zmuv \\
+\hline
+2 & Classifier Design & 77, avg, max \\
+2 & Regularization Method & BN, Dropout \\
+2 & Number of Hidden FC Layers & 0, 1, 2 \\
+2 & Number of Nodes per Layer & 1024, 2048, 4096 \\
+2 & Learning Rate & \\
+2 & Batch Size & 32, 64, 128, 256\\
+\hline
+3 & Number of Frozen Layers & 15, All \\
+3 & Learning Rate & \\
+3 & Batch Size & 32, 64, 128, 256 \\
+3 & Data Augmentation & h, w, r, s, z, f \\
+%\bottomrule
+\hline
+\end{tabular}
+\end{table}
+We will also use some Keras callbacks during our training.  ModelCheckpoint to save only the best models at each epoch, EarlyStopping to stop training when we stop making progress and CSVLogger for plotting purposes.
 
 
 \subsection{Benchmark}
-In this section, you will need to provide a clearly defined benchmark result or threshold for comparing across performances obtained by your solution. The reasoning behind the benchmark (in the case where it is not an established result) should be discussed. Questions to ask yourself when writing this section:
+%In this section, you will need to provide a clearly defined benchmark result or threshold for comparing across performances obtained by your solution. The reasoning behind the benchmark (in the case where it is not an established result) should be discussed. Questions to ask yourself when writing this section:
 
-Has some result or value been provided that acts as a benchmark for measuring performance?
+%Has some result or value been provided that acts as a benchmark for measuring performance?
 
-Is it clear how this result or value was obtained (whether by data or by hypothesis)?
+%Is it clear how this result or value was obtained (whether by data or by hypothesis)?
 
+I was unable to find a VGG16 model trained on COCO to use for benchmarking purposes.  I was however able to find multiple results of multilabel classifiers trained on COCO.  I will use these results when I evaluate the performance of my model in~\ref{sec:eval}.
 
-\section{Methodology} % approx. 3-5 pages
+\section{Methodology}\label{sec:method} % approx. 3-5 pages
 \subsection{Data Preprocessing}
-In this section, all of your preprocessing steps will need to be clearly documented, if any were necessary. From the previous section, any of the abnormalities or characteristics that you identified about the dataset will be addressed and corrected here. Questions to ask yourself when writing this section:
+%In this section, all of your preprocessing steps will need to be clearly documented, if any were necessary. From the previous section, any of the abnormalities or characteristics that you identified about the dataset will be addressed and corrected here. Questions to ask yourself when writing this section:
 
-nus-wide
-         train ,   test
-Object   17928 ,  12072
-Scene    17463 ,  17463
-Lite     27807 ,  27808
-All     161789 , 107859
+%If the algorithms chosen require preprocessing steps like feature selection or feature transformations, have they been properly documented?
 
-coco
-        train, valid, test
-2017
-2015
-2014
+%Based on the **Data Exploration** section, if there were abnormalities or characteristics that needed to be addressed, have they been properly corrected?
 
-If the algorithms chosen require preprocessing steps like feature selection or feature transformations, have they been properly documented?
+%If no preprocessing is needed, has it been made clear why?
 
-zero-mean unit-variance
+There are 2 types of preprocessing we do on the image data. The first is image resizing and normalizing. Before passing any image through the network it must first be resized to match the height and width of the input layer and its values must be converted (normalized) from uint8's to float32's in the range of -1 and 1.  The method by which the images are normalized became a tunable hyperparameter.  Keras comes shipped with a preprocess\_image\footnote{\url{https://github.com/keras-team/keras/blob/master/keras/applications/imagenet_utils.py}} function that is intended to be used for data normalization on VGG16.  If using Keras with the Tensorflow backend this normalization boils down to dividing by 127.5 and then subtracting by 1 for every image.  As an alternate option, the various flavors of model generators in Keras provide to option to normalize images by either featurewise or samplewise zero-mean unit-variance (or ZMUV).  These three normalization methods each provide slightly different results and so we leave the decision as to which one is best as a tunable hyperparameter.\footnote{This part of the study raised an interesting question. Should the input image normalization method be part of the (or be supplied as) supplemental information to the saved model?  In other words, if I download and use a trained model, should I not also expect the model to somehow tell me in what format the model expects the input data to be? There seemed to be conflicting opinions as to which normalizing method should be used.}
 
-Based on the **Data Exploration** section, if there were abnormalities or characteristics that needed to be addressed, have they been properly corrected?
-
-If no preprocessing is needed, has it been made clear why?
+The other type of image preprocessing involves various forms of data augmentation.  Going by the codes in Table~\ref{tab:hyperparams} we will augment the image data by (h) shifting along the height direction, (w) shift along the width direction, (r) performing random rotation, (s) skew transform, (z) multiplying by a zoom factor, and (f) performing horizontal flips.  We will also shuffle the training data after each epoch. We will only perform data augmentation during training, not during top model training as the input images to the top model aren't images but rather features of a deep layer.
 
 
 \subsection{Implementation}
@@ -1155,6 +1216,7 @@ Were there any complications with the original metrics or techniques that requir
 
 Was there any part of the coding process (e.g., writing complicated functions) that should be documented?
 
+We will load the VGG16 model but without the last 3 fully connected layers.  These layers are specific to the 1000 ImageNet classes that the VGG16 model was originally trained on.  N
 
 \subsection{Refinement}
 In this section, you will need to discuss the process of improvement you made upon the algorithms and techniques you used in your implementation. For example, adjusting parameters for certain models to acquire improved solutions would fall under the refinement category. Your initial and final solutions should be reported, as well as any significant intermediate results as necessary. Questions to ask yourself when writing this section:
@@ -1222,7 +1284,7 @@ Are intermediate and final solutions clearly reported as the process is improved
 
 
 \section{Results} % approx. 2-3 pages
-\subsection{Model Evaluation and Validation}
+\subsection{Model Evaluation and Validation}\label{sec:eval}
 In this section, the final model and any supporting qualities should be evaluated in detail. It should be clear how the final model was derived and why this model was chosen. In addition, some type of analysis should be used to validate the robustness of this model and its solution, such as manipulating the input data or environment to see how the model’s solution is affected (this is called sensitivity analysis). Questions to ask yourself when writing this section:
 
 Is the final model reasonable and aligning with solution expectations? Are the final parameters of the model appropriate?
