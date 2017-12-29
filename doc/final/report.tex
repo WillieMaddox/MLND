@@ -312,11 +312,11 @@
 
 
 % *** SUBFIGURE PACKAGES ***
-%\ifCLASSOPTIONcompsoc
-%  \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
-%\else
-%  \usepackage[caption=false,font=footnotesize]{subfig}
-%\fi
+\ifCLASSOPTIONcompsoc
+  \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\else
+  \usepackage[caption=false,font=footnotesize]{subfig}
+\fi
 % subfig.sty, written by Steven Douglas Cochran, is the modern replacement
 % for subfigure.sty, the latter of which is no longer maintained and is
 % incompatible with some LaTeX packages including fixltx2e. However,
@@ -602,8 +602,6 @@ affiliated with an academic institution.\protect\\
 % this is a minor point as most people would not even notice if the said evil
 % space somehow managed to creep in.
 
-
-
 % The paper headers
 \markboth{Journal of \LaTeX\ Class Files,~Vol.~11, No.~4, November~2017}%
 {Maddox \MakeLowercase{\textit{et al.}}: Multi-Label Classification}
@@ -614,8 +612,6 @@ affiliated with an academic institution.\protect\\
 % *** name in the headers of peer review papers.                   ***
 % You can use \ifCLASSOPTIONpeerreview for conditional compilation here if
 % you desire.
-
-
 
 % The publisher's ID mark at the bottom of the page is less important with
 % Computer Society journal papers as those publications place the marks
@@ -631,12 +627,8 @@ affiliated with an academic institution.\protect\\
 % column for its text to clear the IEEEpubid mark (Computer Society journal
 % papers don't need this extra clearance.)
 
-
-
 % use for special paper notices
 %\IEEEspecialpapernotice{(Invited Paper)}
-
-
 
 % for Computer Society papers, we must declare the abstract and index terms
 % PRIOR to the title within the \IEEEtitleabstractindextext IEEEtran
@@ -653,10 +645,8 @@ Machine Learning Engineer Nanodegree Capstone Project
 Deep Learning, Machine Learning, Neural Networks, Keras, Tensorflow, VGG16, MS-COCO, NUS-WIDE.
 \end{IEEEkeywords}}
 
-
 % make the title area
 \maketitle
-
 
 % To allow for easy dual compilation without having to reenter the
 % abstract/keywords data, the \IEEEtitleabstractindextext text will
@@ -669,7 +659,6 @@ Deep Learning, Machine Learning, Neural Networks, Keras, Tensorflow, VGG16, MS-C
 % \IEEEdisplaynontitleabstractindextext has no effect when using
 % compsoc under a non-conference mode.
 
-
 % For peer review papers, you can put extra information on the cover
 % page as needed:
 % \ifCLASSOPTIONpeerreview
@@ -679,7 +668,6 @@ Deep Learning, Machine Learning, Neural Networks, Keras, Tensorflow, VGG16, MS-C
 % For peerreview papers, this IEEEtran command inserts a page break and
 % creates the second title. It will be ignored for other modes.
 \IEEEpeerreviewmaketitle
-
 
 
 \section{Introduction}
@@ -860,10 +848,18 @@ The problem that we will try to solve is finding multiple features (or labels) i
 
 
 \subsection{Metrics}\label{sec:metrics}
+
+\begin{figure*}[!t]
+\normalsize
+\includegraphics[width=\linewidth]{mscoco_label_counts2.png}
+\caption{Number of samples in MS-COCO containing at least one instance of a label.}
+\label{coco_label_counts}
+\vspace*{4pt}
+\end{figure*}
+
 %In this section, you will need to clearly define the metrics or calculations you will use to measure performance of a model or result in your project. These calculations and metrics should be justified based on the characteristics of the problem and problem domain. Questions to ask yourself when writing this section:
 
 %Are the metrics you’ve chosen to measure the performance of your models clearly discussed and defined?
-
 %Have you provided reasonable justification for the metrics chosen based on the problem and solution?
 
 After reading through previous literature on multi-label classification, we found that there are quite a few metrics appropriate for this problem. The mean average precision (mAP) is a widely used metric for comparing between trained models and has been regarded as the best metric for classification problems~\cite{Lavrenko_2014}.  Other popular metrics include precision, recall, $F_1$ score, Jaccard index, 0/1 loss and Hamming loss~\cite{Tsoumakas:2007,SOKOLOVA2009427,Herrera:2016}. 
@@ -881,7 +877,7 @@ For multilabel classification, particularly, the precision, recall, and $F_1$ sc
 \end{equation}
 
 \begin{equation}
-\mathrm{MF_1} = \frac{1}{L}\sum_{j=1}^{L}\frac{2\sum_{i=1}^{N}y_{ij}\hat{y}_{ij}}{\sum_{i=1}^{N}\hat{y}_{ij}+\sum_{i=1}^{m}y_{ij}}
+\mathrm{MF_1} = \frac{1}{L}\sum_{j=1}^{L}\frac{2\sum_{i=1}^{N}y_{ij}\hat{y}_{ij}}{\sum_{i=1}^{N}\hat{y}_{ij}+\sum_{i=1}^{N}y_{ij}}
 \label{eq:MF1}
 \end{equation}
 
@@ -898,7 +894,7 @@ This metric treats all classes equal regardless of their sample size, so focusin
 \end{equation}
 
 \begin{equation}
-\mathrm{iF_1} = \frac{1}{N}\sum_{i=1}^{N}\frac{2\sum_{j=1}^{L}y_{ij}\hat{y}_{ij}}{\sum_{j=1}^{L}\hat{y}_{ij}+\sum_{j=1}^{l}y_{ij}}
+\mathrm{iF_1} = \frac{1}{N}\sum_{i=1}^{N}\frac{2\sum_{j=1}^{L}y_{ij}\hat{y}_{ij}}{\sum_{j=1}^{L}\hat{y}_{ij}+\sum_{j=1}^{L}y_{ij}}
 \label{eq:iF1}
 \end{equation}
 
@@ -985,17 +981,11 @@ When comparing our model to the benchmark models, we will use Eqns~\ref{eq:MP} t
 %In this section, you will be expected to analyze the data you are using for the problem. This data can either be in the form of a dataset (or datasets), input data (or input files), or even an environment. The type of data should be thoroughly described and, if possible, have basic statistics and information presented (such as discussion of input features or defining characteristics about the input or environment). Any abnormalities or interesting qualities about the data that may need to be addressed have been identified (such as features that need to be transformed or the possibility of outliers). Questions to ask yourself when writing this section:
 
 %We use the NUS-WIDE\cite{nus-wide-civr09} dataset as our secondary dataset.
-
 %If a dataset is present for this problem, have you thoroughly discussed certain features about the dataset? 
-
 %Has a data sample been provided to the reader?
-
 %If a dataset is present for this problem, are statistics about the dataset calculated and reported? 
-
 %Have any relevant results from this calculation been discussed?
-
 %If a dataset is **not** present for this problem, has discussion been made about the input space or input data for your problem?
-
 %Are there any abnormalities or characteristics about the input space or dataset that need to be addressed? (categorical variables, missing values, outliers, etc.)
 
 
@@ -1120,62 +1110,52 @@ For this study we will use the (2017) MS-COCO\cite{MSCOCO} dataset as our primar
 %In this section, you will need to provide some form of visualization that summarizes or extracts a relevant characteristic or feature about the data. The visualization should adequately support the data being used. Discuss why this visualization was chosen and how it is relevant. Questions to ask yourself when writing this section:
 
 %Have you visualized a relevant characteristic or feature about the dataset or input data?
-
 %Is the visualization thoroughly analyzed and discussed?
-
 %If a plot is provided, are the axes, title, and datum clearly defined?
 
-In Fig.~\ref{coco_label_counts}, we can see that the dominating class label is \textit{person} with 64115 occurances in the training set and 2693 in the validation set. The least dominating class labels are the \textit{toaster} and \textit{hair drier} with 217 and 189 in the training set and 8 and 9 in the validation set, respectively.
 \begin{figure*}[!t]
 \normalsize
-\includegraphics[width=\linewidth]{mscoco_label_counts.png}
-\caption{Number of samples containing at least one instance of a label.}
-\label{coco_label_counts}
-\vspace*{4pt}
-\end{figure*}
-In Fig.~\ref{coco_n_images_with_k_tags}, we show the number of unique tags per sample.  The majority of the samples have at least 1 to 4 unique labels with 2 unique labels being the most dominate.  We also notice that the training and testing sets have 1021 and 48 samples with no labels. We will keep this fact in mind when running our evaluation metrics.
-\begin{figure*}[!t]
-\normalsize
-\includegraphics[width=\linewidth]{mscoco_n_images_with_k_tags.png}
-\caption{Number of unique labels per sample.}
+\includegraphics[width=\linewidth]{mscoco_n_images_with_k_tags2.png}
+\caption{Number of unique labels per sample in MS-COCO.}
 \label{coco_n_images_with_k_tags}
 \vspace*{4pt}
 \end{figure*}
+
+In Fig.~\ref{coco_label_counts}, we can see that the dominating class label is \textit{person} with 64115 occurances in the training set and 2693 in the validation set. The least dominating class labels are the \textit{toaster} and \textit{hair drier} with 217 and 189 in the training set and 8 and 9 in the validation set, respectively.
+In Fig.~\ref{coco_n_images_with_k_tags}, we show the number of unique tags per sample.  The majority of the samples have at least 1 to 4 unique labels with 2 unique labels being the most dominate.  We also notice that the training and testing sets have 1021 and 48 samples with no labels. We will keep this fact in mind when running our evaluation metrics.
 In both figures, the training set has 20 to 30 times more samples per label than the validation set and the ratios between the training and validation sets are consistent (i.e. the heights of the train and valid bars are about the same.)
 
 \subsection{Algorithms and Techniques}\label{sec:algo}
 %In this section, you will need to discuss the algorithms and techniques you intend to use for solving the problem. You should justify the use of each one based on the characteristics of the problem and the problem domain. Questions to ask yourself when writing this section:
 
 %Are the algorithms you will use, including any default variables/parameters in the project clearly defined?
-
 %Are the techniques to be used thoroughly discussed and justified?
-
 %Is it made clear how the input data or datasets will be handled by the algorithms and techniques chosen?
 
-To solve this problem, we will model our classifier using a deep convolutional neural net.  We will not train our model from scratch, but rather we will perform transfer learning using the VGG16 convnet trained on imagenet.  We will read the images from disk and perform data augmentation using worker threads.  This will make it so the GPU doesn't have to wait on batches thereby maximizing our training efficiency. The final output of the trained model will be a sigmoid layer.  We will use binary cross entropy for our loss function~\cite{deBoer2005} and mini-batch stochastic gradient descent with momentum for backpropogation. Table~\ref{tab:hyperparams} outlines the hyperparameters that will be tuned to optimize the classifier.
+To solve this problem, we will model our classifier using a deep convolutional neural net.  We will not train our model from scratch, but rather we will perform transfer learning using the VGG16 convnet trained on imagenet.  We will read the images from disk and perform data augmentation using worker threads.  This will make it so the GPU doesn't have to wait on batches thereby maximizing our training efficiency. We will use sigmoid activation in the output layer~\cite{Kurata:2016}, binary cross entropy for our loss function~\cite{deBoer2005} and mini-batch stochastic gradient descent with momentum for backpropogation. Table~\ref{tab:hyperparams} outlines the hyperparameters that will be tuned to optimize the classifier.
 \begin{table}
+\caption{List of hyperparameters to tune to optimize the classifier.  There are 2 options for image preprocessing that is used by both Stage 1 and 2: inet - use a global scaling factor and zmuv - use per-image zero-mean unit-variance.  Stage 1 is where the top model gets trained with bottleneck features. BN stands for Batch Normalization. We train the entire model (base + top) in Stage 2.  Please refer to Sec.~\ref{sec:method} for more details.}
 \label{tab:hyperparams}
-\caption{List of hyperparameters to tune to optimize the classifier.  Stage 1 is the image preprocessing stage. inet: use a global scaling factor, zmuv: use per-image zero-mean unit-variance.  Stage 2 is where the top model gets trained with bottleneck features. BN stands for Batch Normalization. We train the entire model (base + top) in Stage 3.  Please refer to Sec.~\ref{sec:method} for more details.}
-\begin{tabular}{lll}
+\begin{tabular}{cll}
 %\centering
 %\toprule
 \hline
 Stage & Hyper-parameter & Variants \\
 %\midrule
 \hline
-1 & Image Preprocessing & inet, zmuv \\
+ & Image Preprocessing & INET, ZMUV \\
 \hline
-2 & Classifier Design & 77, avg, max \\
-2 & Regularization Method & BN, Dropout \\
-2 & Number of Hidden FC Layers & 0, 1, 2 \\
-2 & Number of Nodes per Layer & 1024, 2048, 4096 \\
+1 & Classifier Design & 77, avg, max \\
+1 & Number of Hidden FC Layers & 1 or 2 \\
+1 & Number of Nodes per Layer & 1024, 2048, 4096 \\
+1 & Regularization Method & BN or Dropout \\
+1 & Learning Rate & \\
+1 & Batch Size & 32, 64, 128, 256\\
+\hline
+2 & Number of Frozen Layers & 15, All \\
 2 & Learning Rate & \\
-2 & Batch Size & 32, 64, 128, 256\\
-\hline
-3 & Number of Frozen Layers & 15, All \\
-3 & Learning Rate & \\
-3 & Batch Size & 32, 64, 128, 256 \\
-3 & Data Augmentation & h, w, r, s, z, f \\
+2 & Batch Size & 32, 64, 128, 256 \\
+2 & Data Augmentation & h, w, r, s, z, f \\
 %\bottomrule
 \hline
 \end{tabular}
@@ -1187,100 +1167,185 @@ We will also use some Keras callbacks during our training.  ModelCheckpoint to s
 %In this section, you will need to provide a clearly defined benchmark result or threshold for comparing across performances obtained by your solution. The reasoning behind the benchmark (in the case where it is not an established result) should be discussed. Questions to ask yourself when writing this section:
 
 %Has some result or value been provided that acts as a benchmark for measuring performance?
-
 %Is it clear how this result or value was obtained (whether by data or by hypothesis)?
 
-I was unable to find a VGG16 model trained on COCO to use for benchmarking purposes.  I was however able to find multiple results of multilabel classifiers trained on COCO.  I will use these results when I evaluate the performance of my model in~\ref{sec:eval}.
+We were unable to find a VGG16 model trained on COCO to use for benchmarking purposes.  But we did find multiple results of multilabel classifiers trained on COCO in the literature.  We will use these results when evaluating the performance of our model in~\ref{sec:eval}.
 
 \section{Methodology}\label{sec:method} % approx. 3-5 pages
-\subsection{Data Preprocessing}
+\subsection{Data Preprocessing}\label{sec:preproc}
 %In this section, all of your preprocessing steps will need to be clearly documented, if any were necessary. From the previous section, any of the abnormalities or characteristics that you identified about the dataset will be addressed and corrected here. Questions to ask yourself when writing this section:
 
 %If the algorithms chosen require preprocessing steps like feature selection or feature transformations, have they been properly documented?
-
 %Based on the **Data Exploration** section, if there were abnormalities or characteristics that needed to be addressed, have they been properly corrected?
-
 %If no preprocessing is needed, has it been made clear why?
 
-There are 2 types of preprocessing we do on the image data. The first is image resizing and normalizing. Before passing any image through the network it must first be resized to match the height and width of the input layer and its values must be converted (normalized) from uint8's to float32's in the range of -1 and 1.  The method by which the images are normalized became a tunable hyperparameter.  Keras comes shipped with a preprocess\_image\footnote{\url{https://github.com/keras-team/keras/blob/master/keras/applications/imagenet_utils.py}} function that is intended to be used for data normalization on VGG16.  If using Keras with the Tensorflow backend this normalization boils down to dividing by 127.5 and then subtracting by 1 for every image.  As an alternate option, the various flavors of model generators in Keras provide to option to normalize images by either featurewise or samplewise zero-mean unit-variance (or ZMUV).  These three normalization methods each provide slightly different results and so we leave the decision as to which one is best as a tunable hyperparameter.\footnote{This part of the study raised an interesting question. Should the input image normalization method be part of the (or be supplied as) supplemental information to the saved model?  In other words, if I download and use a trained model, should I not also expect the model to somehow tell me in what format the model expects the input data to be? There seemed to be conflicting opinions as to which normalizing method should be used.}
+There are 2 types of preprocessing we do on the image data. The first is image resizing and normalizing. Before passing any image through the network it must first be resized to match the height and width of the input layer and its values must be converted (normalized) from uint8's to float32's in the range of -1 and 1.  The method by which the images are normalized became a tunable hyperparameter.  Keras comes shipped with a preprocess\_image\footnote{\url{https://github.com/keras-team/keras/blob/master/keras/applications/imagenet_utils.py}} function that is intended to be used for data normalization on VGG16.  If using Keras with the Tensorflow backend this normalization boils down to dividing by 127.5 and then subtracting by 1 for every image.  This is the INET option in Table~\ref{tab:hyperparams}. As an alternate option, the various flavors of model generators in Keras provide to option to normalize images by either featurewise or samplewise zero-mean unit-variance (or ZMUV).  These three normalization methods each provide slightly different results and so we leave the decision as to which one is best as a tunable hyperparameter.\footnote{This part of the study raised an interesting question. Should the input image normalization method be part of the (or be supplied as) supplemental information to the saved model?  In other words, if I download and use a trained model, should I not also expect the model to somehow tell me in what format the model expects the input data to be? There seemed to be conflicting opinions as to which normalizing method should be used.}
 
 The other type of image preprocessing involves various forms of data augmentation.  Going by the codes in Table~\ref{tab:hyperparams} we will augment the image data by (h) shifting along the height direction, (w) shift along the width direction, (r) performing random rotation, (s) skew transform, (z) multiplying by a zoom factor, and (f) performing horizontal flips.  We will also shuffle the training data after each epoch. We will only perform data augmentation during training, not during top model training as the input images to the top model aren't images but rather features of a deep layer.
 
 
 \subsection{Implementation}
-In this section, the process for which metrics, algorithms, and techniques that you implemented for the given data will need to be clearly documented. It should be abundantly clear how the implementation was carried out, and discussion should be made regarding any complications that occurred during this process. Questions to ask yourself when writing this section:
+%In this section, the process for which metrics, algorithms, and techniques that you implemented for the given data will need to be clearly documented. It should be abundantly clear how the implementation was carried out, and discussion should be made regarding any complications that occurred during this process. Questions to ask yourself when writing this section:
 
-Is it made clear how the algorithms and techniques were implemented with the given datasets or input data?
+%Is it made clear how the algorithms and techniques were implemented with the given datasets or input data?
+%Were there any complications with the original metrics or techniques that required changing prior to acquiring a solution?
+%Was there any part of the coding process (e.g., writing complicated functions) that should be documented?
 
-Were there any complications with the original metrics or techniques that required changing prior to acquiring a solution?
+The implementation is divided into 2 stages. In the first stage we load the VGG16 model but without the last 3 fully connected layers.  These layers are specific to the 1000 ImageNet classes that the VGG16 model was originally trained on.  We then run a single prediction calculation the both the training and validation sets. But instead of getting the typical label predictions, we get the output of the last VGG16 convolutional layer.   Depending on our Classifier Design (See Table~\ref{tab:hyperparams}), the output will either be (77) the raw $7\times7\times512$ features, (avg) the 512 features that result from applying GlobalAveragePooling to the raw features, or (max) the 512 features that result from applying GlobalMaxPooling to the raw features.  We refer to these as bottleneck features and save them (along with their ground truth labels) as python numpy arrays.  We then construct a small\footnote{Small in comparison to the base VGG16 model which is 16 layers deep.  Our classifier will have a single hidden layer between the input layer and the ourput layer.} classifier model that we can train using the bottleneck features.  The goal of Stage 1 is to train this "top" model as best we can before attaching it to the VGG16 base for fine tuning.  There are a few reasons for pretraining the classifier.  The top model has fewer layers and the bottleneck features are much smaller $7\times7\times512=25088$ than the original raw images $224\times224\times3=150528$. This leads to fewer parameters to learn and faster training.  We will still need to fine tune the full model in Stage 2, but pretraining the top model in this way provides a much better starting guess than simply initializing the top model with random weights.  Another happy side effect of pretraining the classifier is we can make faster progress with tuning many of our hyperparameters.  Specifically, the optimal classifier design, regularization method, and number of nodes per layer can each be found much faster.
 
-Was there any part of the coding process (e.g., writing complicated functions) that should be documented?
-
-We will load the VGG16 model but without the last 3 fully connected layers.  These layers are specific to the 1000 ImageNet classes that the VGG16 model was originally trained on.  N
+Once the optimal Stage 1 hyperparameters are found then we can proceed to Stage 2 and attach our freshly trained classifier to our base VGG16 model.  We can choose to freeze a certain number of layers (in the base model) before we start fine tuning or we can freeze them all.  For this project we either freeze all layers or just the ones up to the last convolutional block. Weights on frozen layers do not update during backpropogation.  Since we are now training the final model on the raw images it's safe to augment our data as prescribed in Section~\ref{sec:preproc}.  We vary the learning rate for each batch size presented in Table~\ref{tab:hyperparams} and choose the model which minimizes the loss function. 
 
 \subsection{Refinement}
-In this section, you will need to discuss the process of improvement you made upon the algorithms and techniques you used in your implementation. For example, adjusting parameters for certain models to acquire improved solutions would fall under the refinement category. Your initial and final solutions should be reported, as well as any significant intermediate results as necessary. Questions to ask yourself when writing this section:
 
-Has an initial solution been found and clearly reported?
+\begin{figure*}[!t]
+\normalsize
+\subfloat[][]{
+\label{fig:top_pp_pl_lve}
+\includegraphics[width=0.49\linewidth]{top_pp_pl_loss_vs_epoch2.png}}
+%\includegraphics[width=0.49\linewidth]{top_pp_pl_loss_vs_epoch.png}}
+%\includegraphics[width=0.49\linewidth]{loss1.png}}
+\subfloat[][]{
+\label{fig:top_pl_sz_lve}
+\includegraphics[width=0.49\linewidth]{top_pl_sz_loss_vs_epoch2.png}}
+%\includegraphics[width=0.49\linewidth]{top_pl_sz_loss_vs_epoch.png}}
+%\includegraphics[width=0.49\linewidth]{loss2.png}}
+\caption{Top model validation losses as a function of epoch. Each panel explores a different set of hyper-parameters. The yellow and blue curves are of the same data in both plots.}
+\label{fig:top1_pp_pl_sz}
+\vspace*{4pt}
+\end{figure*}
 
-Is the process of improvement clearly documented, such as what techniques were used?
 
-Are intermediate and final solutions clearly reported as the process is improved?
+%In this section, you will need to discuss the process of improvement you made upon the algorithms and techniques you used in your implementation. For example, adjusting parameters for certain models to acquire improved solutions would fall under the refinement category. Your initial and final solutions should be reported, as well as any significant intermediate results as necessary. Questions to ask yourself when writing this section:
 
-%coco_2017_zmuv_avg_d1024_lr13_b32.csv
-%epoch 499:~20s,             loss: 0.0831 - acc: 0.9722 - val_loss: 0.0819 - val_acc: 0.9722
+%Has an initial solution been found and clearly reported?
+%Is the process of improvement clearly documented, such as what techniques were used?
+%Are intermediate and final solutions clearly reported as the process is improved?
 
-%coco_2017_zmuv_avg_d1024_lr11_b16.csv
-%epoch  35: 44s 375us/step - loss: 0.0717 - acc: 0.9754 - val_loss: 0.0713 - val_acc: 0.9755
-%epoch  37: 44s 376us/step - loss: 0.0715 - acc: 0.9755 - val_loss: 0.0711 - val_acc: 0.9757
-%epoch  48: 44s 376us/step - loss: 0.0703 - acc: 0.9758 - val_loss: 0.0709 - val_acc: 0.9756
+At this point we would like to refine our model by tuning some of the Stage 1 hyper-parameters.  We begin by defining some rules for how we will format our log and top model weights filenames\footnote{Logs will be saved as csv's and the weights will be saved in hdf format using the hdf5 extension. The files can be found from the root of the project directory in data/bottleneck\_top\_models.}. This is best explained with a simple example.  Consider the following string, "coco\_2017\_zmuv\_avg\_1x2048d5\_lr11\_b32".  The first field, "coco", refers to the name of the dataset and "2017" is the subset (or version) of the dataset. The other fields follow directly from Table~\ref{tab:hyperparams}. "ZMUV" indicates zero-mean unit-variance scaling was used to normalize the input images.  The $4^{th}$ field, "avg" denotes the use of GlobalAveragePooling on the final layer of the base VGG16 model.  This also describes the shape of the input to the top model.  The next term, "1x2048d5" is a combination of 3 hyper-parameters that describe the fully connected layers in the top model.  The "1x2048" indicates that there is 1 hidden layer and that it has "2048" nodes.  All FC layers are immediately followed by a ReLU activation layer which is then followed by either a dropout ("d") layer or a batch normalization ("bn") layer.  For dropout, the number after the "d" indicates the percentage of nodes that get dropped.  So "d3" would mean that only 30\% of the nodes are dropped.  The second to last field gives information about the learning rate in the form "lrXY" which should be interpreted as $\mathrm{lr = X * 10^{-Y}}$.  So, lr53 would indicate a learning rate of 0.005, lr11 would be 0.1, and so forth. The final field, "b32" denotes the batch size.
+
+The first hyper-parameter we looked at was image preprocessing method.  We compared the results between each method by looking at how they compared for each of the different classifier designs.  In all cases, the ZMUV preprocessing method led to lower validation losses as seen in Fig.~\ref{fig:top_pp_pl_lve}.  We also looked at how well the different classifier designs compared to each other.  Looking again at Fig.~\ref{fig:top_pp_pl_lve} we can see that the 77 design performed much worse than the global max and global average pooling designs. To determine whether global max or global average pooling is better, we compare them against different layer sizes as shown in Fig.~\ref{fig:top_pl_sz_lve}.  In all three cases the validation loss was lower when using global average pooling.  We can also see from Fig.~\ref{fig:top_pl_sz_lve} that increasing the number of nodes per layer brings about lower validation losses. 
+
+At this point in our analysis it is important to note that we are using a relatively high learning rate 0.1, relative in that we are trying to make a judgement on which choice of layer size is best but the noise in the loss curves make it hard to say one way or the other which one is better. Based on the initial results from Fig.~\ref{fig:top_pp_pl_lve} and~\ref{fig:top_pl_sz_lve}, we will hencefourth use ZMUV for all image preprocessing and global average pooling for the final layer, which consequently defines the shape of the input to our our top model. This will allow us focus more closely on tuning the remaining hyperparameters for the top model: that is the number of layers, the layer size, the learning rate, and the batch size.
 
 
-%coco_2017_zmuv_avg_d1024_lr13_b04.csv
-%epoch 1: 150s 
-%epoch 2: 150s
-%epoch 3: 149s
-%epoch 4: 148s
-%epoch 5: 149s
-%epoch 6: 148s 1ms/step - loss: 0.1027 - acc: 0.9685 - val_loss: 0.0992 - val_acc: 0.9685
-%epoch 7: 147s 1ms/step - loss: 0.1008 - acc: 0.9687 - val_loss: 0.0977 - val_acc: 0.9687
-%epoch 8: 147s 1ms/step - loss: 0.0993 - acc: 0.9689 - val_loss: 0.0965 - val_acc: 0.9688
+\begin{figure}[!t]
+\normalsize
+\subfloat[][]{
+\label{fig:top_nl_sz_lve}
+\includegraphics[width=\linewidth]{top_nl_sz_loss_vs_epoch2}} \\
+\subfloat[][]{
+\label{fig:top_nl_lr_lve}
+\includegraphics[width=\linewidth]{top_nl_lr_loss_vs_epoch2}} \\
+\subfloat[][]{
+\label{fig:top_sz_lr_lve}
+\includegraphics[width=\linewidth]{top_sz_lr_loss_vs_epoch2}} \\
+\caption{Top model validation losses as a function of epoch. Each panel explores a different set of hyper-parameters.}
+\label{fig:top2_nl_sz_lr}
+\vspace*{4pt}
+\end{figure}
 
-%coco_2017_zmuv_77_d4096_lr11_b16
-%222s
-%coco_2017_zmuv_max_d4096_lr11_b16
-%38s
-%coco_2017_zmuv_avg_d4096_lr11_b16
-%38s
 
-%coco_2017_zmuv_avg_d1024_lr13_b04_15_lr13_b64.csv
-%467s to 472s
 
-%coco_2017_zmuv_avg_d2048_2048_lr11_b32.csv
-%23s
-%coco_2017_zmuv_avg_d2048_2048_lr11_b32_15_lr12_b128_hwrszf
-%448s
+The loss profiles up to this point look somewhat noisy so we would like to see if increasing the size of our mini-batches can help smooth out this noise.  In Fig.~\ref{loss1234}-C, we plot validation loss with varying layer size and mini-batch size.  From these results there does not seem to be any noticeable advantage to using 16 vs 32 mini-batch sizes.  The b16 runs seem to do slightly better than the b32 runs under matching epochs but the b32 runs train faster and can cover more epochs before early stopping is triggered.
 
-%coco_2017_zmuv_avg_b2048_lr11_b16
-%50s
-%coco_2017_zmuv_avg_b2048_lr11_b32
-%25s
-%coco_2017_zmuv_avg_b2048_lr12_b32
-%25s
-%coco_2017_zmuv_avg_b2048_lr12_b64
-%13s
-%coco_2017_zmuv_avg_b2048_lr13_b64
-%13s
-%coco_2017_zmuv_avg_b2048_lr53_b64
-%13s
-%coco_2017_zmuv_avg_b2048_lr12_b64_15_lr12_b64_f
-%490s
-%coco_2017_zmuv_77_b2048_lr13_b128
-%37s
-%coco_2017_zmuv_77_b2048_lr52_b128
-%35s
-%coco_2017_zmuv_avg_d2048_2048_lr11_b32_15_lr32_b128_hwrszf
-%450s
+The final hyper-parameter we would like to refine is the number of FC layers to use in the top model classifier.  The original VGG16 model has 3 dense FC layers. The first 2 hidden layers have 4096 nodes and the last output layer has 1000 nodes equal to the number of classes in ImageNet. We calculate the loss profiles for the three different layer sizes and compare between 1 and 2 hidden layers.  Looking at the results of Fig.~\ref{loss1234}-D the losses when using 2 hidden layers are lower than when using a single hidden layer.  It is not clear at this point which is the best choice in terms of layer sizes and number of layers.  We may need to fine-tune a few different models and compare the results using our evaluation metrics. 
+
+
+\begin{figure*}%[!t]
+\subfloat[][]{
+\normalsize
+\label{fig:top_lr_bs_lve}
+\includegraphics[width=0.49\linewidth]{top_lr_bs_loss_vs_epoch2.png}}
+\subfloat[][]{
+\normalsize
+\label{fig:top_lr_bs_lvt}
+\includegraphics[width=0.49\linewidth]{top_lr_bs_loss_vs_time2.png}}
+\caption{Top model validation losses as a function of time. The lr11 and lr52 correspond to 0.1 and 0.05 learning rates respectively.  We scaled the x-axis for each run by multiplying through the average training time per epoch.}
+\label{fig:top3_sz_lr_bs}
+\vspace*{4pt}
+\end{figure*}
+
+
+%coco_2017_zmuv_avg_1x1024d5_lr13_b04 148s
+%coco_2017_zmuv_avg_1x1024d5_lr13_b32 20s
+%coco_2017_zmuv_avg_1x1024d5_lr11_b16 44s
+
+%coco_2017_inet_avg_1x1024d5_lr11_b32 19s
+%coco_2017_inet_max_1x1024d5_lr11_b32 17s - 18s
+%coco_2017_inet_77_1x1024d5_lr11_b32 51s
+%coco_2017_zmuv_77_1x1024d5_lr11_b32 50s
+%coco_2017_zmuv_77_1x2048bn_lr13_b128 37s
+%coco_2017_zmuv_77_1x2048bn_lr52_b128 35s
+%coco_2017_zmuv_77_1x4096d5_lr11_b16 222s
+%coco_2017_zmuv_max_1x4096d5_lr11_b32 20s
+%coco_2017_zmuv_max_1x2048d5_lr11_b32 18s
+
+%coco_2017_zmuv_avg_1x2048bn_lr11_b16 50s
+%coco_2017_zmuv_avg_1x2048bn_lr11_b32 25s
+%coco_2017_zmuv_avg_1x2048bn_lr12_b32 25s
+%coco_2017_zmuv_avg_1x2048bn_lr12_b64 13s
+%coco_2017_zmuv_avg_1x2048bn_lr13_b64 13s
+%coco_2017_zmuv_avg_1x2048bn_lr53_b64 13s
+%coco_2017_zmuv_avg_1x2048bn_lr12_b64_15_lr12_b64_f 490s
+
+
+%coco_2017_zmuv_avg_1x1024d5_lr11_b16 36
+%coco_2017_zmuv_avg_1x4096d5_lr11_b16 37s - 38s
+%coco_2017_zmuv_avg_2x4096d5_lr12_b128 10s
+%coco_2017_zmuv_avg_2x4096d5_lr12_b32 34s
+%coco_2017_zmuv_avg_2x4096d5_lr52_b256 6s
+%coco_2017_zmuv_avg_3x1024d5_lr11_b32 22s
+%coco_2017_zmuv_avg_3x2048d5_lr11_b32 27s
+%coco_2017_zmuv_avg_3x4096d5_lr11_b32 49s
+
+
+%coco_2017_zmuv_avg_1x1024d5_lr11_b32
+%coco_2017_zmuv_avg_1x1024d5_lr11_b64  10s
+%coco_2017_zmuv_avg_1x1024d5_lr11_b128 5s
+%coco_2017_zmuv_avg_1x1024d5_lr52_b32
+%coco_2017_zmuv_avg_1x1024d5_lr52_b64  9s
+%coco_2017_zmuv_avg_1x1024d5_lr52_b128 4s-5s
+
+%coco_2017_zmuv_avg_1x2048d5_lr11_b32
+%coco_2017_zmuv_avg_1x2048d5_lr11_b64  9s
+%coco_2017_zmuv_avg_1x2048d5_lr11_b128
+%coco_2017_zmuv_avg_1x2048d5_lr52_b32 17-19s
+%coco_2017_zmuv_avg_1x2048d5_lr52_b64  9s
+%coco_2017_zmuv_avg_1x2048d5_lr52_b128 5s
+
+%coco_2017_zmuv_avg_1x4096d5_lr11_b32
+%coco_2017_zmuv_avg_1x4096d5_lr11_b64  10s-11s
+%coco_2017_zmuv_avg_1x4096d5_lr11_b128  5s
+%coco_2017_zmuv_avg_1x4096d5_lr52_b32  18-19s
+%coco_2017_zmuv_avg_1x4096d5_lr52_b64   9s-10s
+%coco_2017_zmuv_avg_1x4096d5_lr52_b128  5s
+
+%coco_2017_zmuv_avg_2x1024d5_lr11_b32  21s
+%coco_2017_zmuv_avg_2x1024d5_lr11_b64  10s-11s
+%coco_2017_zmuv_avg_2x1024d5_lr11_b128  6s
+%coco_2017_zmuv_avg_2x1024d5_lr52_b32  19-20s
+%coco_2017_zmuv_avg_2x1024d5_lr52_b64  10s
+%coco_2017_zmuv_avg_2x1024d5_lr52_b128  5s
+
+%coco_2017_zmuv_avg_2x2048d5_lr11_b32  23s
+%coco_2017_zmuv_avg_2x2048d5_lr11_b64  12s-13s
+%coco_2017_zmuv_avg_2x2048d5_lr11_b128  7s
+%coco_2017_zmuv_avg_2x2048d5_lr52_b32  24s
+%coco_2017_zmuv_avg_2x2048d5_lr52_b64  11-12s
+%coco_2017_zmuv_avg_2x2048d5_lr52_b128  6s
+
+%coco_2017_zmuv_avg_2x4096d5_lr11_b32  35s
+%coco_2017_zmuv_avg_2x4096d5_lr11_b64  19s
+%coco_2017_zmuv_avg_2x4096d5_lr11_b128 10s
+%coco_2017_zmuv_avg_2x4096d5_lr52_b32  35s
+%coco_2017_zmuv_avg_2x4096d5_lr52_b64  19s
+%coco_2017_zmuv_avg_2x4096d5_lr52_b128 10s
+
+
+
+%coco_2017_zmuv_avg_1x1024d5_lr13_b04_15_lr13_b64 467s to 472s
+%coco_2017_zmuv_avg_2x2048d5_lr11_b32_15_lr12_b128_hwrszf 448s
+%coco_2017_zmuv_avg_2x2048d5_lr11_b32_15_lr32_b128_hwrszf 450s
 
 
 \section{Results} % approx. 2-3 pages
@@ -1295,7 +1360,6 @@ Is the model robust enough for the problem? Do small perturbations (changes) in 
 
 Can results found from the model be trusted?
 
-
 \subsection{Justification}
 In this section, your model’s final solution and its results should be compared to the benchmark you established earlier in the project using some type of statistical analysis. You should also justify whether these results and the solution are significant enough to have solved the problem posed in the project. Questions to ask yourself when writing this section:
 
@@ -1304,6 +1368,49 @@ Are the final results found stronger than the benchmark result reported earlier?
 Have you thoroughly analyzed and discussed the final solution?
 
 Is the final solution significant enough to have solved the problem?
+
+
+\begin{table}
+\caption{Comparisons on MS-COCO validation dataset for $k=3$. The macro precision $\mathrm{MP}$, macro recall $\mathrm{MR}$, and macro $\mathrm{F}$ score $\mathrm{MF_1}$ are evaluated for each label class before averaging.  The micro precision $\mathrm{\mu P}$, micro recall $\mathrm{\mu R}$, and micro $\mathrm{F}$ score $\mathrm{\mu F_1}$ are averaged over all instance-label pairs.}
+\label{tab:PRF1}
+\begin{tabular}{lllllll}
+%\centering
+%\toprule
+\hline
+Method & $\mathrm{MP}$ & $\mathrm{MR}$ & $\mathrm{MF_1}$ & $\mathrm{\mu P}$ & $\mathrm{\mu R}$ & $\mathrm{\mu F_1}$ \\
+%\midrule
+\hline
+KNN~\cite{nus-wide-civr09}    & 32.6 & 19.3 & 24.3 & 42.9 & 53.4 & 47.6 \\
+WARP~\cite{GongJLTI13}        & 59.3 & 52.5 & 55.7 & 59.8 & 61.4 & 60.7 \\
+Softmax~\cite{WangYMHHX16}    & 59.0 & 57.0 & 58.0 & 60.2 & 62.1 & 61.1 \\
+BCE~\cite{WangYMHHX16}        & 59.3 & 58.6 & 58.9 & 61.7 & 65.0 & 63.3 \\
+No RNN~\cite{WangYMHHX16}     & 65.3 & 54.5 & 59.3 & 68.5 & 61.3 & 65.7 \\
+CNN-RNN~\cite{WangYMHHX16}    & 66.0 & 55.6 & 60.4 & 69.2 & 66.4 & 67.8 \\
+\hline
+ResNet-101~\cite{HeZRS15}     & 84.3 & 57.4 & 65.9 & 86.5 & 61.3 & 71.7 \\
+ResNet-107~\cite{ZhuLOYW17}   & 84.4 & 57.6 & 66.1 & 86.4 & 61.4 & 71.8 \\
+ResNet-101-s~\cite{ZhuLOYW17} & 84.3 & 57.7 & 66.2 & 86.3 & 61.8 & 72.0 \\
+ResNet-SRN-a~\cite{ZhuLOYW17} & 85.8 & 57.5 & 66.3 & 88.1 & 61.1 & 72.1 \\
+ResNet-SRN~\cite{ZhuLOYW17}   & 85.2 & 58.8 & 67.4 & 87.4 & 62.5 & 72.9 \\
+\hline
+             & 56.7 & 55.7 & 54.1 & 60.3 & 61.3 & 60.8 \\ % 2x2048d5_lr11_b32_15_lr52_b128_hwrszf ~500s
+             & 56.8 & 55.6 & 54.1 & 60.4 & 61.3 & 60.9 \\ % 2x2048d5_lr11_b32_15_lr32_b128_hwrszf ~500s
+             & 56.0 & 55.6 & 53.9 & 60.1 & 61.0 & 60.6 \\ % 2x2048d5_lr11_b32_15_lr12_b128_hwrszf ~500s
+             & 55.2 & 54.3 & 52.8 & 59.6 & 60.5 & 60.0 \\ % 2x2048d5_lr11_b32_15_lr53_b128_hwrszf ~500s
+             & 52.7 & 52.2 & 50.5 & 58.2 & 59.1 & 58.6 \\ % 2x2048d5_lr11_b32_15_lr13_b128_hwrszf ~500s
+\hline
+             & 55.5 & 54.6 & 53.0 & 59.7 & 60.6 & 60.1 \\ % 2x4096d5_lr11_b32_15_lr53_b128_hwrszf ~450-550
+             & 56.1 & 55.2 & 53.7 & 59.9 & 60.8 & 60.4 \\ % 2x4096d5_lr11_b32_15_lr52_b128_hwrszf
+             & 56.0 & 54.7 & 53.2 & 59.9 & 60.8 & 60.4 \\ % 2x4096d5_lr11_b32_15_lr12_b128_hwrszf
+             & 54.5 & 55.8 & 53.2 & 60.0 & 60.8 & 60.3 \\ % 2x4096d5_lr11_b32_15_lr11_b128_f
+             & 54.9 & 55.4 & 53.1 & 60.2 & 61.1 & 60.7 \\ % 2x4096d5_lr11_b32_15_lr52_b128_f
+             & 56.8 & 56.0 & 54.5 & 60.4 & 61.1 & 60.9 \\ % 2x4096d5_lr11_b128_15_lr52_b128_hwrszf ~442s
+             & 59.2 & 58.5 & 57.6 & 69.4 & 69.4 & 69.4 \\ % 2x4096d5_lr11_b128_15_lr52_b128_hwrszf k==3 908
+             & 65.2 & 45.4 & 51.4 & 75.4 & 51.5 & 61.2 \\ % 2x4096d5_lr11_b128_15_lr52_b128_hwrszf k>=3 2405
+%\bottomrule
+\hline
+\end{tabular}
+\end{table}
 
 
 \section{Conclusion} % approx. 1-2 pages
@@ -1318,16 +1425,23 @@ If a plot is provided, are the axes, title, and datum clearly defined?
 
 
 \subsection{Reflection}
-In this section, you will summarize the entire end-to-end problem solution and discuss one or two particular aspects of the project you found interesting or difficult. You are expected to reflect on the project as a whole to show that you have a firm understanding of the entire process employed in your work. Questions to ask yourself when writing this section:
+%In this section, you will summarize the entire end-to-end problem solution and discuss one or two particular aspects of the project you found interesting or difficult. You are expected to reflect on the project as a whole to show that you have a firm understanding of the entire process employed in your work. Questions to ask yourself when writing this section:
 
-Have you thoroughly summarized the entire process you used for this project?
+% Have you thoroughly summarized the entire process you used for this project?
 
-Were there any interesting aspects of the project?
+To summarize the project we used transfer learning to create a multilabel classifier trained on the MS-COCO dataset.  We started with a VGG16 neural network trained on ImageNet as our base model and replaced the final fully connected layers with a classifier pretrained using bottleneck features.  
 
-Were there any difficult aspects of the project?
+% Were there any interesting aspects of the project?
 
-Does the final model and solution fit your expectations for the problem, and should it be used in a general setting to solve these types of problems?
+During both training and pretraining the validation accuracy was always high between 96\% and 98\%. Accuracy is (true posititives + true negatives) / (total population).  There are $5000*80=400000$ total possibilities for positive labels in the population but there are only 14631 ground truth positives.  This means that in the worst case scenario, if we predicted all negatives, we would still wind up with an accuracy of 96.34\%. This is a great example of how accuracy can be a very misleading metric. As such, we did not use this metric in the project.
 
+%Were there any difficult aspects of the project?
+
+We explored a wide range of hyperparameters and while some of them were presented a greater challenge in terms of optimization, we did not feel that the overall task was necessarily difficult.
+
+%Does the final model and solution fit your expectations for the problem, and should it be used in a general setting to solve these types of problems?
+
+Our final model We were able to do better than some groups but not every group.  It seems that the best models for multilabel classification are those which incorporate region proposal networks and/or some flavor of RNN.
 
 \subsection{Improvement}
 In this section, you will need to provide discussion as to how one aspect of the implementation you designed could be improved. As an example, consider ways your implementation can be made more general, and what would need to be modified. You do not need to make this improvement, but the potential solutions resulting from these changes are considered and compared/contrasted to your current solution. Questions to ask yourself when writing this section:
@@ -1336,10 +1450,9 @@ In this section, you will need to provide discussion as to how one aspect of the
 
 We take a very naive approach to creating the labels for the COCO dataset.  Specifically each image has associated with it an 80 element vector of 0's or 1's where the 1's denote that the particular class is found in the image.  However the label vector does not take into account multiple instances of the same class, nor does it take into account how much of the actual image the labeled object occupies.  It might be interesting to use segmentation maps or object bounding boxes to obtain a percent coverage of the image and use those values instead of a simple binary vector.
 
-Were there algorithms or techniques you researched that you did not know how to implement, but would consider using if you knew how?
+% Were there algorithms or techniques you researched that you did not know how to implement, but would consider using if you knew how?
 
-It would have been interesting to explore hierarchial classification with using RNN's to learn...
-zcf whitening with large datasets.
+It would have been interesting to explore the label-to-label hierarchial relationships using WordNet and use those relationships to incorporate either a word2vec type embedding layer or an RNN based on the hierarchial sequences.  Also, incorporation of region proposal networks using either bounding boxes or segmentation maps would have been useful.  It would also have been interesting to see how zcf whitening might affect our training.  However, with such a large dataset as COCO, we didn't have the computational capacity to perform the SVD.
 
 If you used your final solution as the new benchmark, do you think an even better solution exists?
 
@@ -1348,21 +1461,21 @@ If you used your final solution as the new benchmark, do you think an even bette
 Before submitting, ask yourself...
 \begin{itemize}
 
-  \item Does the project report you’ve written follow a well-organized structure similar to that of the project template?
+%  \item Does the project report you’ve written follow a well-organized structure similar to that of the project template?
   \item Is each section (particularly \textbf{Analysis} and \textbf{Methodology}) written in a clear, concise and specific fashion? Are there any ambiguous terms or phrases that need clarification?
   \item Would the intended audience of your project be able to understand your analysis, methods, and results?
   \item Have you properly proof-read your project report to assure there are minimal grammatical and spelling mistakes?
   \item Are all the resources used for this project correctly cited and referenced?
   \item Is the code that implements your solution easily readable and properly commented?
-  \item Does the code execute without error and produce results similar to those reported?
+%  \item Does the code execute without error and produce results similar to those reported?
 
 \end{itemize}
 
-example~\cite{Sechidis2011}
+%example~\cite{Sechidis2011}
 
-MS-COCO~\cite{MSCOCO}
+%MS-COCO~\cite{MSCOCO}
 
-Add back in the negative images and further improve evaluation metrics to handle zero label images.
+%Add back in the negative images and further improve evaluation metrics to handle zero label images.
 
 
 
