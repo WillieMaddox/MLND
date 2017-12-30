@@ -851,7 +851,7 @@ The problem that we will try to solve is finding multiple features (or labels) i
 
 \begin{figure*}[!t]
 \normalsize
-\includegraphics[width=\linewidth]{mscoco_label_counts2.png}
+\includegraphics[width=\linewidth]{mscoco_label_counts.png}
 \caption{Number of samples in MS-COCO containing at least one instance of a label.}
 \label{coco_label_counts}
 \vspace*{4pt}
@@ -1115,7 +1115,7 @@ For this study we will use the (2017) MS-COCO\cite{MSCOCO} dataset as our primar
 
 \begin{figure*}[!t]
 \normalsize
-\includegraphics[width=\linewidth]{mscoco_n_images_with_k_tags2.png}
+\includegraphics[width=\linewidth]{mscoco_n_images_with_k_tags.png}
 \caption{Number of unique labels per sample in MS-COCO.}
 \label{coco_n_images_with_k_tags}
 \vspace*{4pt}
@@ -1134,7 +1134,9 @@ In both figures, the training set has 20 to 30 times more samples per label than
 
 To solve this problem, we will model our classifier using a deep convolutional neural net.  We will not train our model from scratch, but rather we will perform transfer learning using the VGG16 convnet trained on imagenet.  We will read the images from disk and perform data augmentation using worker threads.  This will make it so the GPU doesn't have to wait on batches thereby maximizing our training efficiency. We will use sigmoid activation in the output layer~\cite{Kurata:2016}, binary cross entropy for our loss function~\cite{deBoer2005} and mini-batch stochastic gradient descent with momentum for backpropogation. Table~\ref{tab:hyperparams} outlines the hyperparameters that will be tuned to optimize the classifier.
 \begin{table}
-\caption{List of hyperparameters to tune to optimize the classifier.  There are 2 options for image preprocessing that is used by both Stage 1 and 2: inet - use a global scaling factor and zmuv - use per-image zero-mean unit-variance.  Stage 1 is where the top model gets trained with bottleneck features. BN stands for Batch Normalization. We train the entire model (base + top) in Stage 2.  Please refer to Sec.~\ref{sec:method} for more details.}
+\caption{List of hyperparameters to tune to optimize the classifier.  There are 2 options for image preprocessing that is used by both Stage 1 and 2: inet - use a global scaling factor and zmuv - use per-image zero-mean unit-variance.  Stage 1 is where the top model gets trained with bottleneck features.
+%BN stands for Batch Normalization.
+We train the entire model (base + top) in Stage 2.  Please refer to Sec.~\ref{sec:method} for more details. Note: Batch sizes of 256 will be used only for a few select cases.}
 \label{tab:hyperparams}
 \begin{tabular}{cll}
 %\centering
@@ -1148,8 +1150,8 @@ Stage & Hyper-parameter & Variants \\
 1 & Classifier Design & 77, avg, max \\
 1 & Number of Hidden FC Layers & 1 or 2 \\
 1 & Number of Nodes per Layer & 1024, 2048, 4096 \\
-1 & Regularization Method & BN or Dropout \\
-1 & Learning Rate & \\
+%1 & Regularization Method & BN or Dropout \\
+1 & Learning Rate & 0.1, 0.05\\
 1 & Batch Size & 32, 64, 128, 256\\
 \hline
 2 & Number of Frozen Layers & 15, All \\
@@ -1191,24 +1193,20 @@ The other type of image preprocessing involves various forms of data augmentatio
 %Were there any complications with the original metrics or techniques that required changing prior to acquiring a solution?
 %Was there any part of the coding process (e.g., writing complicated functions) that should be documented?
 
-The implementation is divided into 2 stages. In the first stage we load the VGG16 model but without the last 3 fully connected layers.  These layers are specific to the 1000 ImageNet classes that the VGG16 model was originally trained on.  We then run a single prediction calculation the both the training and validation sets. But instead of getting the typical label predictions, we get the output of the last VGG16 convolutional layer.   Depending on our Classifier Design (See Table~\ref{tab:hyperparams}), the output will either be (77) the raw $7\times7\times512$ features, (avg) the 512 features that result from applying GlobalAveragePooling to the raw features, or (max) the 512 features that result from applying GlobalMaxPooling to the raw features.  We refer to these as bottleneck features and save them (along with their ground truth labels) as python numpy arrays.  We then construct a small\footnote{Small in comparison to the base VGG16 model which is 16 layers deep.  Our classifier will have a single hidden layer between the input layer and the ourput layer.} classifier model that we can train using the bottleneck features.  The goal of Stage 1 is to train this "top" model as best we can before attaching it to the VGG16 base for fine tuning.  There are a few reasons for pretraining the classifier.  The top model has fewer layers and the bottleneck features are much smaller $7\times7\times512=25088$ than the original raw images $224\times224\times3=150528$. This leads to fewer parameters to learn and faster training.  We will still need to fine tune the full model in Stage 2, but pretraining the top model in this way provides a much better starting guess than simply initializing the top model with random weights.  Another happy side effect of pretraining the classifier is we can make faster progress with tuning many of our hyperparameters.  Specifically, the optimal classifier design, regularization method, and number of nodes per layer can each be found much faster.
+The implementation is divided into 2 stages. In the first stage we load the VGG16 model but without the last 3 fully connected layers. These layers are specific to the 1000 ImageNet classes that the VGG16 model was originally trained on. We then run a single prediction calculation the both the training and validation sets. But instead of getting the typical label predictions, we get the output of the last VGG16 convolutional layer. Depending on our Classifier Design (See Table~\ref{tab:hyperparams}), the output will either be (77) the raw $7\times7\times512$ features, (avg) the 512 features that result from applying global average pooling to the raw features, or (max) the 512 features that result from applying global max pooling to the raw features. We refer to these as bottleneck features and save them (along with their ground truth labels) as python numpy arrays. We then construct a small\footnote{Small in comparison to the base VGG16 model which is 16 layers deep. Our classifier will have a single hidden layer between the input layer and the ourput layer.} classifier model that we can train using the bottleneck features. The goal of Stage 1 is to train this "top" model as best we can before attaching it to the VGG16 base for fine tuning. There are a few reasons for pretraining the classifier. The top model has fewer layers and the bottleneck features are much smaller $7\times7\times512=25088$ than the original raw images $224\times224\times3=150528$. This leads to fewer parameters to learn and faster training. We will still need to fine tune the full model in Stage 2, but pretraining the top model in this way provides a much better starting guess than simply initializing the top model with random weights. Another happy side effect of pretraining the classifier is we can make faster progress with tuning many of our hyperparameters. Specifically, the optimal classifier design, regularization method, and number of nodes per layer can each be found much faster.
 
-Once the optimal Stage 1 hyperparameters are found then we can proceed to Stage 2 and attach our freshly trained classifier to our base VGG16 model.  We can choose to freeze a certain number of layers (in the base model) before we start fine tuning or we can freeze them all.  For this project we either freeze all layers or just the ones up to the last convolutional block. Weights on frozen layers do not update during backpropogation.  Since we are now training the final model on the raw images it's safe to augment our data as prescribed in Section~\ref{sec:preproc}.  We vary the learning rate for each batch size presented in Table~\ref{tab:hyperparams} and choose the model which minimizes the loss function. 
+Once the optimal Stage 1 hyperparameters are found then we can proceed to Stage 2 and attach our freshly trained classifier to our base VGG16 model. We can choose to freeze a certain number of layers (in the base model) before we start fine tuning or we can freeze them all. For this project we either freeze all layers or just the ones up to the last convolutional block. Weights on frozen layers do not update during backpropogation. Since we are now training the final model on the raw images it's safe to augment our data as prescribed in Section~\ref{sec:preproc}. We vary the learning rate for various batch sizes as presented in Table~\ref{tab:hyperparams} and choose the model which minimizes the loss function. 
 
-\subsection{Refinement}
+\subsection{Refinement}\label{refine}
 
 \begin{figure*}[!t]
 \normalsize
 \subfloat[][]{
 \label{fig:top_pp_pl_lve}
-\includegraphics[width=0.49\linewidth]{top_pp_pl_loss_vs_epoch2.png}}
-%\includegraphics[width=0.49\linewidth]{top_pp_pl_loss_vs_epoch.png}}
-%\includegraphics[width=0.49\linewidth]{loss1.png}}
+\includegraphics[width=0.49\linewidth]{top_pp_pl_loss_vs_epoch.png}}
 \subfloat[][]{
 \label{fig:top_pl_sz_lve}
-\includegraphics[width=0.49\linewidth]{top_pl_sz_loss_vs_epoch2.png}}
-%\includegraphics[width=0.49\linewidth]{top_pl_sz_loss_vs_epoch.png}}
-%\includegraphics[width=0.49\linewidth]{loss2.png}}
+\includegraphics[width=0.49\linewidth]{top_pl_sz_loss_vs_epoch.png}}
 \caption{Top model validation losses as a function of epoch. Each panel explores a different set of hyper-parameters. The yellow and blue curves are of the same data in both plots.}
 \label{fig:top1_pp_pl_sz}
 \vspace*{4pt}
@@ -1221,50 +1219,53 @@ Once the optimal Stage 1 hyperparameters are found then we can proceed to Stage 
 %Is the process of improvement clearly documented, such as what techniques were used?
 %Are intermediate and final solutions clearly reported as the process is improved?
 
-At this point we would like to refine our model by tuning some of the Stage 1 hyper-parameters.  We begin by defining some rules for how we will format our log and top model weights filenames\footnote{Logs will be saved as csv's and the weights will be saved in hdf format using the hdf5 extension. The files can be found from the root of the project directory in data/bottleneck\_top\_models.}. This is best explained with a simple example.  Consider the following string, "coco\_2017\_zmuv\_avg\_1x2048d5\_lr11\_b32".  The first field, "coco", refers to the name of the dataset and "2017" is the subset (or version) of the dataset. The other fields follow directly from Table~\ref{tab:hyperparams}. "ZMUV" indicates zero-mean unit-variance scaling was used to normalize the input images.  The $4^{th}$ field, "avg" denotes the use of GlobalAveragePooling on the final layer of the base VGG16 model.  This also describes the shape of the input to the top model.  The next term, "1x2048d5" is a combination of 3 hyper-parameters that describe the fully connected layers in the top model.  The "1x2048" indicates that there is 1 hidden layer and that it has "2048" nodes.  All FC layers are immediately followed by a ReLU activation layer which is then followed by either a dropout ("d") layer or a batch normalization ("bn") layer.  For dropout, the number after the "d" indicates the percentage of nodes that get dropped.  So "d3" would mean that only 30\% of the nodes are dropped.  The second to last field gives information about the learning rate in the form "lrXY" which should be interpreted as $\mathrm{lr = X * 10^{-Y}}$.  So, lr53 would indicate a learning rate of 0.005, lr11 would be 0.1, and so forth. The final field, "b32" denotes the batch size.
+At this point we would like to refine our model by tuning some of the Stage 1 hyper-parameters.  We begin by defining some rules for how we will format our log and top model weights filenames\footnote{Logs will be saved as csv's and the weights will be saved in hdf format using the hdf5 extension. The files can be found from the root of the project directory in data/bottleneck\_top\_models.}. This is best explained with a simple example. Consider the following string, "coco\_2017\_zmuv\_avg\_1x2048d5\_lr11\_b32". The first field, "coco", refers to the name of the dataset and "2017" is the subset (or version) of the dataset. The other fields follow directly from Table~\ref{tab:hyperparams}. "ZMUV" indicates zero-mean unit-variance scaling was used to normalize the input images. The $4^{th}$ field, "avg" denotes the use of GlobalAveragePooling on the final layer of the base VGG16 model. This also describes the shape of the input to the top model. The next term, "1x2048d5" is a combination of 3 hyper-parameters that describe the fully connected layers in the top model. The "1x2048" indicates that there is 1 hidden layer and that it has "2048" nodes.  All FC layers are immediately followed by a ReLU activation layer which is then followed by either a dropout ("d") layer or a batch normalization ("bn") layer. For dropout, the number after the "d" indicates the percentage of nodes that get dropped. So "d3" would mean that only 30\% of the nodes are dropped. The second to last field gives information about the learning rate in the form "lrXY" which should be interpreted as $\mathrm{lr = X * 10^{-Y}}$.  So, lr53 would indicate a learning rate of 0.005, lr11 would be 0.1, and so forth. The final field, "b32" denotes the batch size.
 
-The first hyper-parameter we looked at was image preprocessing method.  We compared the results between each method by looking at how they compared for each of the different classifier designs.  In all cases, the ZMUV preprocessing method led to lower validation losses as seen in Fig.~\ref{fig:top_pp_pl_lve}.  We also looked at how well the different classifier designs compared to each other.  Looking again at Fig.~\ref{fig:top_pp_pl_lve} we can see that the 77 design performed much worse than the global max and global average pooling designs. To determine whether global max or global average pooling is better, we compare them against different layer sizes as shown in Fig.~\ref{fig:top_pl_sz_lve}.  In all three cases the validation loss was lower when using global average pooling.  We can also see from Fig.~\ref{fig:top_pl_sz_lve} that increasing the number of nodes per layer brings about lower validation losses. 
+The first hyper-parameter we looked at was image preprocessing method. We compared the results between each method by looking at how they compared for each of the different classifier designs. In all cases, the ZMUV preprocessing method led to lower validation losses as seen in Fig.~\ref{fig:top_pp_pl_lve}. We also looked at how well the different classifier designs compared to each other. Looking again at Fig.~\ref{fig:top_pp_pl_lve} we can see that the 77 design performed much worse than the global max and global average pooling designs. To determine whether global max or global average pooling is better, we compare them against different layer sizes as shown in Fig.~\ref{fig:top_pl_sz_lve}. In all three cases the validation loss was lower when using global average pooling. In light of these preliminary results we will restrict the remaining hyperparameter tuning calculations to using only ZMUV to preprocess the images and global average pooling to cap off the end of the VGG16 pretrained model. A consequence of transfer learning is that the input shape of our top model will need to match the output shape of our base model. With global average pooling, this simplifies the input shape from $512\times7\times7$ features to $512\times1\times1$ features. This will greatly reduce the training time of our top model classifier and enable faster progress while we tune the remaining hyperparameters.
 
-At this point in our analysis it is important to note that we are using a relatively high learning rate 0.1, relative in that we are trying to make a judgement on which choice of layer size is best but the noise in the loss curves make it hard to say one way or the other which one is better. Based on the initial results from Fig.~\ref{fig:top_pp_pl_lve} and~\ref{fig:top_pl_sz_lve}, we will hencefourth use ZMUV for all image preprocessing and global average pooling for the final layer, which consequently defines the shape of the input to our our top model. This will allow us focus more closely on tuning the remaining hyperparameters for the top model: that is the number of layers, the layer size, the learning rate, and the batch size.
-
-
-\begin{figure}[!t]
+\begin{figure}%[!ht]
 \normalsize
 \subfloat[][]{
 \label{fig:top_nl_sz_lve}
-\includegraphics[width=\linewidth]{top_nl_sz_loss_vs_epoch2}} \\
+\includegraphics[width=\linewidth]{top_nl_sz_loss_vs_epoch}} \\
 \subfloat[][]{
 \label{fig:top_nl_lr_lve}
-\includegraphics[width=\linewidth]{top_nl_lr_loss_vs_epoch2}} \\
+\includegraphics[width=\linewidth]{top_nl_lr_loss_vs_epoch}} \\
 \subfloat[][]{
 \label{fig:top_sz_lr_lve}
-\includegraphics[width=\linewidth]{top_sz_lr_loss_vs_epoch2}} \\
-\caption{Top model validation losses as a function of epoch. Each panel explores a different set of hyper-parameters.}
+\includegraphics[width=\linewidth]{top_sz_lr_loss_vs_epoch}} \\
+\caption{Top model validation losses as a function of epoch. Each panel explores a different set of hyper-parameters. All results are for a mini batch size of 128. The colors are the same for same data in each plot.  For example, The teal curves in all three plots are of the same data. The shorter curves are a result of early stopping. Refer to Section~\ref{refine} for further details.}
 \label{fig:top2_nl_sz_lr}
 \vspace*{4pt}
 \end{figure}
 
-
-
-The loss profiles up to this point look somewhat noisy so we would like to see if increasing the size of our mini-batches can help smooth out this noise.  In Fig.~\ref{loss1234}-C, we plot validation loss with varying layer size and mini-batch size.  From these results there does not seem to be any noticeable advantage to using 16 vs 32 mini-batch sizes.  The b16 runs seem to do slightly better than the b32 runs under matching epochs but the b32 runs train faster and can cover more epochs before early stopping is triggered.
-
-The final hyper-parameter we would like to refine is the number of FC layers to use in the top model classifier.  The original VGG16 model has 3 dense FC layers. The first 2 hidden layers have 4096 nodes and the last output layer has 1000 nodes equal to the number of classes in ImageNet. We calculate the loss profiles for the three different layer sizes and compare between 1 and 2 hidden layers.  Looking at the results of Fig.~\ref{loss1234}-D the losses when using 2 hidden layers are lower than when using a single hidden layer.  It is not clear at this point which is the best choice in terms of layer sizes and number of layers.  We may need to fine-tune a few different models and compare the results using our evaluation metrics. 
-
+The results of Fig.~\ref{fig:top_pl_sz_lve} also suggest that there may exist a relationship between the validation loss and the layer size, namely that increasing the number of nodes per layer brings about lower validation losses. It worth noting that up until now we have been using a somewhat high learning rate of 0.1. The higher the learning rate the more the validation loss fluctuates from one training epoch to the next. This fact makes it hard to say one way or another which layer size is better. 
 
 \begin{figure*}%[!t]
 \subfloat[][]{
 \normalsize
 \label{fig:top_lr_bs_lve}
-\includegraphics[width=0.49\linewidth]{top_lr_bs_loss_vs_epoch2.png}}
+\includegraphics[width=0.49\linewidth]{top_lr_bs_loss_vs_epoch.png}}
 \subfloat[][]{
 \normalsize
 \label{fig:top_lr_bs_lvt}
-\includegraphics[width=0.49\linewidth]{top_lr_bs_loss_vs_time2.png}}
-\caption{Top model validation losses as a function of time. The lr11 and lr52 correspond to 0.1 and 0.05 learning rates respectively.  We scaled the x-axis for each run by multiplying through the average training time per epoch.}
-\label{fig:top3_sz_lr_bs}
+\includegraphics[width=0.49\linewidth]{top_lr_bs_loss_vs_time.png}}
+\caption{Top model validation losses as a function of (a) Epoch and (b) Time. The lr11 and lr52 correspond to 0.1 and 0.05 learning rates respectively.  In (b), We scaled the x-axis for each run by multiplying through the average training time per epoch.}
+\label{fig:top3_lr_bs}
 \vspace*{4pt}
 \end{figure*}
 
+In the rest of this section, we present the results from a grid search that we performed on the remaining top model hyperparameters, namely those listed under Table~\ref{tab:hyperparams} stage 1. The original VGG16 model has 3 dense fully connected layers. The first 2 layers are hidden and have 4096 nodes each. The last output layer has 1000 nodes equal to the number of classes in ImageNet. Since the COCO dataset consists of only 80 unique classes we will test the performance of using only a single hidden layer versus using two hidden layers. We would also like to see how different layer sizes (1024, 2048, and 4096) affect performance. The size of the hidden layers in VGG16 is 4096. Again, since we are working with only 80 classes, we may be able to get as good performance with smaller layer sizes. As we did before in Fig.~\ref{fig:top1_pp_pl_sz} we will use a learning rate of 0.1 but also compare how the performance changes when we cut the learning rate in half (e.g. 0.05). In general, the higher the learning rate, the faster the training time. If it appears from these preliminary results that we need to explore further smaller learning rates, we will do so on a case by case basis. The final hyperparameter for tuning our top model is the batch size. We will look at 3 sizes, 32, 64, and 128. The grid search on these four hyperparameters yields $2*3*2*3 = 32$ pretraining runs. For brevity, only a selection of these results are shown\footnote{See the Jupyter notebook for all 32 pretraining plots.}. 
+
+The results shown of Fig.~\ref{fig:top2_nl_sz_lr} are all for a mini batch size of 128. In Fig.~\ref{fig:top_nl_sz_lve}, we compare how the number of hidden layers and the size of the hidden layers affects performance. For both the single and double layer cases validation loss decreases with increased layer size. Also, the losses for the double layer models are all lower than those of the single layer models. Next, in Fig.~\ref{fig:top_nl_lr_lve}, we hold the layer size fixed at 4096 nodes per layer and compare relationships between the number of layers and the learning rate. Independent of the learning rate, the double layer runs perform much better than the single layer runs. We also observe that the training runs with the higher learning rate start to flatten out a little faster than the others. This is typical as higher learning rates tend to find a local minimia quickly. In Fig.~\ref{fig:top_sz_lr_lve}, we hold the number of hidden layers fixed at 2 layers and compare the realtionship between number of nodes per layer and learning rate. As the number of nodes per layer increases the validation loss decreases. The validation loss was also lower in all cases where the larger learning rate was used. 
+
+These results suggest better performance should be expected using 2 hidden layers with 4096 nodes per layer. Also, we can afford to use a little higher learning rate than we usually would. Typically, high learning rates tend to lead to overfitting. However, since the entropic capacity of the top model classifier is fairly low it does not have as strong a tendency to overfit.
+
+The final hyperparameter to optimize is the batch size. Using the results above, we set the number of layers to 2 and the number of nodes per layer to 4096. We plot the relationship between learning rate and batch size in Fig.~\ref{fig:top3_lr_bs}. In Fig.~\ref{fig:top_lr_bs_lve}, we see an interesting relationship.  The curves of training runs tend to overlap when both the learning rate and the batch size are both multiplied by the same constant factor (here 2 or $\nicefrac{1}{2}$). The loss curves in Fig.~\ref{fig:top_lr_bs_lvt} are the same as those in Fig.~\ref{fig:top_lr_bs_lve} but plotted with respect to training time. From this perspective it appears that in order to train fast one needs only focus on setting the learning rate as high as possible without overfitting. Increasing the batch size can help smooth out the validation losses between epochs and consequently reduce overfitting.
+
+%data plots are slightly smoother for lower learning rate
+
+It is not clear at this point what will be the best choice for our final model in terms of learning rate and batch size. In the next section we fine-tune a few different models and compare the results using our evaluation metrics. 
 
 %coco_2017_zmuv_avg_1x1024d5_lr13_b04 148s
 %coco_2017_zmuv_avg_1x1024d5_lr13_b32 20s
@@ -1340,7 +1341,6 @@ The final hyper-parameter we would like to refine is the number of FC layers to 
 %coco_2017_zmuv_avg_2x4096d5_lr52_b32  35s
 %coco_2017_zmuv_avg_2x4096d5_lr52_b64  19s
 %coco_2017_zmuv_avg_2x4096d5_lr52_b128 10s
-
 
 
 %coco_2017_zmuv_avg_1x1024d5_lr13_b04_15_lr13_b64 467s to 472s
@@ -1437,11 +1437,10 @@ During both training and pretraining the validation accuracy was always high bet
 
 %Were there any difficult aspects of the project?
 
-We explored a wide range of hyperparameters and while some of them were presented a greater challenge in terms of optimization, we did not feel that the overall task was necessarily difficult.
-
 %Does the final model and solution fit your expectations for the problem, and should it be used in a general setting to solve these types of problems?
 
-Our final model We were able to do better than some groups but not every group.  It seems that the best models for multilabel classification are those which incorporate region proposal networks and/or some flavor of RNN.
+We explored a wide range of hyperparameters and while some of them were presented a greater challenge in terms of optimization, we did not feel that the overall task was necessarily difficult. Our final model We were able to do better than some groups but not every group. It seems that the best models for multilabel classification are those which incorporate region proposal networks and/or some flavor of RNN.
+% \cite yolo and faster-rcnn and cnn-rnn and resnet-SRN
 
 \subsection{Improvement}
 In this section, you will need to provide discussion as to how one aspect of the implementation you designed could be improved. As an example, consider ways your implementation can be made more general, and what would need to be modified. You do not need to make this improvement, but the potential solutions resulting from these changes are considered and compared/contrasted to your current solution. Questions to ask yourself when writing this section:
