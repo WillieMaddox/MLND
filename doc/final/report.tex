@@ -842,9 +842,9 @@ In machine learning, image classification is the problem of deciding to which ca
 
 %Is an anticipated solution clearly defined? Will the reader understand what results you are looking for?
 
-Classifiers such as AlexNet and VGGNet which are typically trained on single class image data such as the 1000 class ImageNet dataset are also able to classify multiple objects in images even though they weren't specifically trained to do so. This happens because the output of the classifier is simply a list of probabilities for every possible class label.  These probabilities range from zero to one and the probability whos value is closest to one is typically regarded as the \textit{winning} prediction.  However, if we take the top 3 or even the top 5 highest probable labels we will often find that these \textit{runner-up} predictions can also be found in the image.  
+Classifiers such as AlexNet and VGGNet which are typically trained on single class image data such as the 1000 class ImageNet dataset are also able to classify multiple objects in images even though they weren't specifically trained to do so. This happens because the output of the classifier is simply a list of probabilities for every possible class label.  These probabilities range from zero to one and the probability whose value is closest to one is typically regarded as the \textit{winning} prediction.  However, if we take the top 3 or even the top 5 highest probable labels we will often find that these \textit{runner-up} predictions can also be found in the image.  
 
-The problem that we will try to solve is finding multiple features (or labels) in a single image. We would also like to know how much better our trained multi-label classifier is at predicting the top $k$ labels for a given image as compared to a standard single-label classifiers like VGG16~\cite{SimonyanZ14a} trained on ImageNet? Can we train a classifier using multi-labelled image data to perform at least as well as existing models trained on single-class image data.  A model trained on multi-labelled image data should, in theory, require fewer data samples since more information per image is avaliable to training. Is this also true?  Let's find out.
+The problem that we will try to solve is finding multiple features (or labels) in a single image. We would also like to know how much better our trained multi-label classifier is at predicting the top $k$ labels for a given image as compared to a standard single-label classifiers like VGG16~\cite{SimonyanZ14a} trained on ImageNet? Can we train a classifier using multi-labeled image data to perform at least as well as existing models trained on single-class image data.  A model trained on multi-labeled image data should, in theory, require fewer data samples since more information per image is available to training. Is this also true?  Let's find out.
 
 
 \subsection{Metrics}\label{sec:metrics}
@@ -864,7 +864,7 @@ The problem that we will try to solve is finding multiple features (or labels) i
 
 After reading through previous literature on multi-label classification, we found that there are quite a few metrics appropriate for this problem. The mean average precision (mAP) is a widely used metric for comparing between trained models and has been regarded as the best metric for classification problems~\cite{Lavrenko_2014}.  Other popular metrics include precision, recall, $F_1$ score, Jaccard index, 0/1 loss and Hamming loss~\cite{Tsoumakas:2007,SOKOLOVA2009427,Herrera:2016}. 
 
-For multilabel classification, particularly, the precision, recall, and $F_1$ score have three different variants which we will use~\cite{MADJAROV20123084,WuZ16,Koyejo:2015,GongJLTI13}. \textit{Macro-averaging} measures the average classification performance across labels.  
+For multi-label classification, particularly, the precision, recall, and $F_1$ score have three different variants which we will use~\cite{MADJAROV20123084,WuZ16,Koyejo:2015,GongJLTI13}. \textit{Macro-averaging} measures the average classification performance across labels.  
 
 \begin{equation}
 \mathrm{MP} = \frac{1}{L}\sum_{j=1}^{L}\frac{\sum_{i=1}^{N}y_{ij}\hat{y}_{ij}}{\sum_{i=1}^{N}y_{ij}}
@@ -958,7 +958,7 @@ The second type of label decision is thresholding. Using this approach the label
     \end{array}
 \right.
 \end{equation}
-Typically this value is set to 0.5 and is a logical choice for multiclass classification where the raw predictions come from the output of a softmax layer.  For multilabel classification it is more common to see a sigmoid function used for the final layer, hence the separation between positive and negative predictions becomes less obvious. To this end, we choose a threshold that minimizes the difference in label cardinality between the ground truth labels $y_{ij}$ and the predictions $\hat{y}_{ij}$.~\cite{Read:2011}
+Typically this value is set to 0.5 and is a logical choice for multi-class classification where the raw predictions come from the output of a softmax layer.  For multi-label classification it is more common to see a sigmoid function used for the final layer, hence the separation between positive and negative predictions becomes less obvious. To this end, we choose a threshold that minimizes the difference in label cardinality between the ground truth labels $y_{ij}$ and the predictions $\hat{y}_{ij}$.~\cite{Read:2011}
 
 \begin{equation}
 \mathrm{LCard} = \frac{1}{N}\sum_{i=1}^{N}\sum_{j=1}^{L}y_{ij}
@@ -969,7 +969,7 @@ Typically this value is set to 0.5 and is a logical choice for multiclass classi
 \tau = \mathrm{argmin}\left\|\left(\mathrm{LCard}-\frac{1}{N}\sum_{i=1}^{N}\sum_{j=1}^{L}1_{h_{ij} \geq \tau}\right)\right\|
 \label{eq:tau}
 \end{equation}
-When comparing our model to the benchmark models, we will use Eqns~\ref{eq:MP} through~\ref{eq:mF1}. When comparing the results of our model to those previously reported in the literature, we will restrict ourselves to using only those metrics for which there is a direct comparison to the previous work.
+When comparing our model to the benchmark models, we will use Eqns.~\ref{eq:MP} through~\ref{eq:mF1}. When comparing the results of our model to those previously reported in the literature, we will restrict ourselves to using only those metrics for which there is a direct comparison to the previous work.
 
 %The Mean Average Precision @ 5 is:
 %\begin{equation}
@@ -991,7 +991,7 @@ When comparing our model to the benchmark models, we will use Eqns~\ref{eq:MP} t
 %Are there any abnormalities or characteristics about the input space or dataset that need to be addressed? (categorical variables, missing values, outliers, etc.)
 
 
-For this study we will use the (2017) MS-COCO\cite{MSCOCO} dataset as our primary dataset. The COCO dataset is freely downloadable from the internet and contains images with multiple labels per image making them ideal for this kind of study. The COCO dataset contains a training set of 118,287 images and a validation set of 5,000 images.  The images are colored and the size of each image is about 600 * 400 pixels.  The MS-COCO dataset has 80 labels with 2.9 labels per image on average.  However, both training and validation sets have images with no labels.  This is not so much a problem for training as it is for testing.  Specifically, when we evaluate our predictions using the metrics from Section~\ref{sec:metrics}, empty labeled samples could lead to divide by zero errors.  Hence, we will only use labelled samples for testing. 
+For this study we will use the (2017) MS-COCO\cite{MSCOCO} dataset as our primary dataset. The COCO dataset is freely downloadable from the internet and contains images with multiple labels per image making them ideal for this kind of study. The COCO dataset contains a training set of 118,287 images and a validation set of 5,000 images.  The images are colored and the size of each image is about 600 * 400 pixels.  The MS-COCO dataset has 80 labels with 2.9 labels per image on average.  However, both training and validation sets have images with no labels.  This is not so much a problem for training as it is for testing.  Specifically, when we evaluate our predictions using the metrics from Section~\ref{sec:metrics}, empty labeled samples could lead to divide by zero errors.  Hence, we will only use labeled samples for testing. 
 
 %They are also large enough that we can use them for training.
 
@@ -1123,7 +1123,7 @@ For this study we will use the (2017) MS-COCO\cite{MSCOCO} dataset as our primar
 \vspace*{4pt}
 \end{figure*}
 
-In Fig.~\ref{fig:coco_label_counts}, we can see that the dominating class label is \textit{person} with 64115 occurances in the training set and 2693 in the validation set. The least dominating class labels are the \textit{toaster} and \textit{hair drier} with 217 and 189 in the training set and 8 and 9 in the validation set, respectively.
+In Fig.~\ref{fig:coco_label_counts}, we can see that the dominating class label is \textit{person} with 64115 occurrences in the training set and 2693 in the validation set. The least dominating class labels are the \textit{toaster} and \textit{hair drier} with 217 and 189 in the training set and 8 and 9 in the validation set, respectively.
 In Fig.~\ref{fig:coco_n_images_with_k_tags}, we show the number of unique tags per sample. The majority of the samples have at least 1 to 4 unique labels with 2 unique labels being the most dominate. We also notice that the training and testing sets have 1021 and 48 samples with no labels. We will keep this fact in mind when running our evaluation metrics.
 In both figures, the training set has 20 to 30 times more samples per label than the validation set and the ratios between the training and validation sets are consistent (i.e. the heights of the train and valid bars are about the same.)
 
@@ -1134,9 +1134,9 @@ In both figures, the training set has 20 to 30 times more samples per label than
 %Are the techniques to be used thoroughly discussed and justified?
 %Is it made clear how the input data or datasets will be handled by the algorithms and techniques chosen?
 
-To solve this problem, we will model our classifier using a deep convolutional neural net. We will not train our model from scratch, but rather we will perform transfer learning using the VGG16 convnet trained on imagenet. We will read the images from disk and perform data augmentation using worker threads. This will make it so the GPU doesn't have to wait on batches thereby maximizing our training efficiency. We will use sigmoid activation in the output layer~\cite{Kurata:2016}, binary cross entropy for our loss function~\cite{deBoer2005} and mini-batch stochastic gradient descent with momentum for backpropogation. Table~\ref{tab:hyperparams} outlines the hyperparameters that will be tuned to optimize the classifier.
+To solve this problem, we will model our classifier using a deep convolutional neural net. We will not train our model from scratch, but rather we will perform transfer learning using the VGG16 convnet trained on ImageNet. We will read the images from disk and perform data augmentation using worker threads. This will make it so the GPU doesn't have to wait on batches thereby maximizing our training efficiency. We will use sigmoid activation in the output layer~\cite{Kurata:2016}, binary cross entropy for our loss function~\cite{deBoer2005} and mini-batch stochastic gradient descent with momentum for backpropogation. Table~\ref{tab:hyperparams} outlines the hyper-parameters that will be tuned to optimize the classifier.
 \begin{table}
-\caption{List of hyperparameters to tune to optimize the classifier. There are 2 options for image preprocessing that is used by both Stage 1 and 2: inet - use a global scaling factor and zmuv - use per-image zero-mean unit-variance.  Stage 1 is where the top model gets trained with bottleneck features.
+\caption{List of hyper-parameters to tune to optimize the classifier. There are 2 options for image preprocessing that is used by both Stage 1 and 2: inet - use a global scaling factor and zmuv - use per-image zero-mean unit-variance.  Stage 1 is where the top model gets trained with bottleneck features.
 %BN stands for Batch Normalization.
 We train the entire model (base + top) in Stage 2.  Please refer to Sec.~\ref{sec:method} for more details. Note: Batch sizes of 256 will be used only for a few select cases.}
 \label{tab:hyperparams}
@@ -1175,7 +1175,7 @@ We will also use some Keras callbacks during our training.  ModelCheckpoint to s
 %Has some result or value been provided that acts as a benchmark for measuring performance?
 %Is it clear how this result or value was obtained (whether by data or by hypothesis)?
 
-We were unable to find a VGG16 model trained on COCO to use for benchmarking purposes.  But we did find multiple results of multilabel classifiers trained on COCO in the literature.  We will use these results when evaluating the performance of our model in~\ref{sec:eval}.
+We were unable to find a VGG16 model trained on COCO to use for benchmarking purposes.  But we did find multiple results of multi-label classifiers trained on COCO in the literature.  We will use these results when evaluating the performance of our model in~\ref{sec:eval}.
 
 \section{Methodology}\label{sec:method} % approx. 3-5 pages
 \subsection{Data Preprocessing}\label{sec:preproc}
@@ -1185,7 +1185,7 @@ We were unable to find a VGG16 model trained on COCO to use for benchmarking pur
 %Based on the **Data Exploration** section, if there were abnormalities or characteristics that needed to be addressed, have they been properly corrected?
 %If no preprocessing is needed, has it been made clear why?
 
-There are 2 types of preprocessing we do on the image data. The first is image resizing and normalizing. Before passing any image through the network it must first be resized to match the height and width of the input layer and its values must be converted (normalized) from uint8's to float32's in the range of -1 and 1.  The method by which the images are normalized became a tunable hyperparameter.  Keras comes shipped with a preprocess\_image\footnote{\url{https://github.com/keras-team/keras/blob/master/keras/applications/imagenet_utils.py}} function that is intended to be used for data normalization on VGG16.  If using Keras with the Tensorflow backend this normalization boils down to dividing by 127.5 and then subtracting by 1 for every image.  This is the INET option in Table~\ref{tab:hyperparams}. As an alternate option, the various flavors of model generators in Keras provide to option to normalize images by either featurewise or samplewise zero-mean unit-variance (or ZMUV).  These three normalization methods each provide slightly different results and so we leave the decision as to which one is best as a tunable hyperparameter.\footnote{This part of the study raised an interesting question. Should the input image normalization method be part of the (or be supplied as) supplemental information to the saved model?  In other words, if I download and use a trained model, should I not also expect the model to somehow tell me in what format the model expects the input data to be? There seemed to be conflicting opinions as to which normalizing method should be used.}
+There are 2 types of preprocessing we do on the image data. The first is image resizing and normalizing. Before passing any image through the network it must first be resized to match the height and width of the input layer and its values must be converted (normalized) from uint8's to float32's in the range of -1 and 1.  The method by which the images are normalized became a tunable hyper-parameter.  Keras comes shipped with a preprocess\_image\footnote{\url{https://github.com/keras-team/keras/blob/master/keras/applications/ImageNet_utils.py}} function that is intended to be used for data normalization on VGG16.  If using Keras with the Tensorflow backend this normalization boils down to dividing by 127.5 and then subtracting by 1 for every image.  This is the INET option in Table~\ref{tab:hyperparams}. As an alternate option, the various flavors of model generators in Keras provide to option to normalize images by either featurewise or samplewise zero-mean unit-variance (or ZMUV).  These three normalization methods each provide slightly different results and so we leave the decision as to which one is best as a tunable hyper-parameter.\footnote{This part of the study raised an interesting question. Should the input image normalization method be part of the (or be supplied as) supplemental information to the saved model?  In other words, if I download and use a trained model, should I not also expect the model to somehow tell me in what format the model expects the input data to be? There seemed to be conflicting opinions as to which normalizing method should be used.}
 
 The other type of image preprocessing involves various forms of data augmentation.  Going by the codes in Table~\ref{tab:hyperparams} we will augment the image data by (h) shifting along the height direction, (w) shift along the width direction, (r) performing random rotation, (s) skew transform, (z) multiplying by a zoom factor, and (f) performing horizontal flips.  We will also shuffle the training data after each epoch. We will only perform data augmentation during training, not during top model training as the input images to the top model aren't images but rather features of a deep layer.
 
@@ -1196,13 +1196,9 @@ The other type of image preprocessing involves various forms of data augmentatio
 %Were there any complications with the original metrics or techniques that required changing prior to acquiring a solution?
 %Was there any part of the coding process (e.g., writing complicated functions) that should be documented?
 
-The implementation is divided into 2 stages. In the first stage we load the VGG16 model but without the last 3 fully connected layers. These layers are specific to the 1000 ImageNet classes that the VGG16 model was originally trained on. We then run a single prediction calculation the both the training and validation sets. But instead of getting the typical label predictions, we get the output of the last VGG16 convolutional layer. Depending on our Classifier Design (See Table~\ref{tab:hyperparams}), the output will either be (77) the raw $7\times7\times512$ features, (avg) the 512 features that result from applying global average pooling to the raw features, or (max) the 512 features that result from applying global max pooling to the raw features. We refer to these as bottleneck features and save them (along with their ground truth labels) as python numpy arrays. We then construct a small\footnote{Small in comparison to the base VGG16 model which is 16 layers deep. Our classifier will have a single hidden layer between the input layer and the ourput layer.} classifier model that we can train using the bottleneck features. The goal of Stage 1 is to train this "top" model as best we can before attaching it to the VGG16 base for fine tuning. There are a few reasons for pretraining the classifier. The top model has fewer layers and the bottleneck features are much smaller $7\times7\times512=25088$ than the original raw images $224\times224\times3=150528$. This leads to fewer parameters to learn and faster training. We will still need to fine tune the full model in Stage 2, but pretraining the top model in this way provides a much better starting guess than simply initializing the top model with random weights. Another happy side effect of pretraining the classifier is we can make faster progress with tuning many of our hyperparameters. Specifically, the optimal classifier design, regularization method, and number of nodes per layer can each be found much faster.
+The implementation is divided into 2 stages. In the first stage we load the VGG16 model but without the last 3 fully connected layers. These layers are specific to the 1000 ImageNet classes that the VGG16 model was originally trained on. We then run a single prediction calculation the both the training and validation sets. But instead of getting the typical label predictions, we get the output of the last VGG16 convolutional layer. Depending on our Classifier Design (See Table~\ref{tab:hyperparams}), the output will either be (77) the raw $7\times7\times512$ features, (avg) the 512 features that result from applying global average pooling to the raw features, or (max) the 512 features that result from applying global max pooling to the raw features. We refer to these as bottleneck features and save them (along with their ground truth labels) as python numpy arrays. We then construct a small\footnote{Small in comparison to the base VGG16 model which is 16 layers deep. Our classifier will have a single hidden layer between the input layer and the output layer.} classifier model that we can train using the bottleneck features. The goal of Stage 1 is to train this "top" model as best we can before attaching it to the VGG16 base for fine tuning. There are a few reasons for pretraining the classifier. The top model has fewer layers and the bottleneck features are much smaller $7\times7\times512=25088$ than the original raw images $224\times224\times3=150528$. This leads to fewer parameters to learn and faster training. We will still need to fine tune the full model in Stage 2, but pretraining the top model in this way provides a much better starting guess than simply initializing the top model with random weights. Another happy side effect of pretraining the classifier is we can make faster progress with tuning many of our hyper-parameters. Specifically, the optimal classifier design, regularization method, and number of nodes per layer can each be found much faster.
 
-Once the optimal Stage 1 hyperparameters are found then we can proceed to Stage 2 and attach our freshly trained classifier to our base VGG16 model. We can choose to freeze a certain number of layers (in the base model) before we start fine tuning or we can freeze them all. For this project we either freeze all layers or just the ones up to the last convolutional block. Weights on frozen layers do not update during backpropogation. Since we are now training the final model on the raw images it's safe to augment our data as prescribed in Section~\ref{sec:preproc}. We vary the learning rate for various batch sizes as presented in Table~\ref{tab:hyperparams} and choose the model which minimizes the loss function. 
-
-\subsection{Refinement}\label{refine}
-
-\begin{figure*}[!t]
+\begin{figure*}%[!t]
 \normalsize
 \subfloat[][]{
 \label{fig:top_pp_pl_lve}
@@ -1212,9 +1208,12 @@ Once the optimal Stage 1 hyperparameters are found then we can proceed to Stage 
 \includegraphics[width=0.49\linewidth]{top_pl_sz_loss_vs_epoch.png}}
 \caption{Top model validation losses as a function of epoch. Each panel explores a different set of hyper-parameters. The yellow and blue curves are of the same data in both plots.}
 \label{fig:top1_pp_pl_sz}
-\vspace*{4pt}
+\vspace*{1pt}
 \end{figure*}
 
+Once the optimal Stage 1 hyper-parameters are found then we can proceed to Stage 2 and attach our freshly trained classifier to our base VGG16 model. We can choose to freeze a certain number of layers (in the base model) before we start fine tuning or we can freeze them all. For this project we either freeze all layers or just the ones up to the last convolutional block. Weights on frozen layers do not update during backpropogation. Since we are now training the final model on the raw images it's safe to augment our data as prescribed in Section~\ref{sec:preproc}. We vary the learning rate for various batch sizes as presented in Table~\ref{tab:hyperparams} and choose the model which minimizes the loss function. 
+
+\subsection{Refinement}\label{refine}
 
 %In this section, you will need to discuss the process of improvement you made upon the algorithms and techniques you used in your implementation. For example, adjusting parameters for certain models to acquire improved solutions would fall under the refinement category. Your initial and final solutions should be reported, as well as any significant intermediate results as necessary. Questions to ask yourself when writing this section:
 
@@ -1222,9 +1221,9 @@ Once the optimal Stage 1 hyperparameters are found then we can proceed to Stage 
 %Is the process of improvement clearly documented, such as what techniques were used?
 %Are intermediate and final solutions clearly reported as the process is improved?
 
-At this point we would like to refine our model by tuning some of the Stage 1 hyper-parameters.  We begin by defining some rules for how we will format our log and top model weights filenames\footnote{Logs will be saved as csv's and the weights will be saved in hdf format using the hdf5 extension. The files can be found from the root of the project directory in data/bottleneck\_top\_models.}. This is best explained with a simple example. Consider the following string, "coco\_2017\_zmuv\_avg\_1x2048d5\_lr11\_b32". The first field, "coco", refers to the name of the dataset and "2017" is the subset (or version) of the dataset. The other fields follow directly from Table~\ref{tab:hyperparams}. "ZMUV" indicates zero-mean unit-variance scaling was used to normalize the input images. The $4^{th}$ field, "avg" denotes the use of GlobalAveragePooling on the final layer of the base VGG16 model. This also describes the shape of the input to the top model. The next term, "1x2048d5" is a combination of 3 hyper-parameters that describe the fully connected layers in the top model. The "1x2048" indicates that there is 1 hidden layer and that it has "2048" nodes.  All FC layers are immediately followed by a ReLU activation layer which is then followed by either a dropout ("d") layer or a batch normalization ("bn") layer. For dropout, the number after the "d" indicates the percentage of nodes that get dropped. So "d3" would mean that only 30\% of the nodes are dropped. The second to last field gives information about the learning rate in the form "lrXY" which should be interpreted as $\mathrm{lr = X * 10^{-Y}}$.  So, lr53 would indicate a learning rate of 0.005, lr11 would be 0.1, and so forth. The final field, "b32" denotes the batch size.
+At this point we would like to refine our model by tuning some of the Stage 1 hyper-parameters.  We begin by defining some rules for how we will format our log and top model weights filenames\footnote{Logs will be saved as csv's and the weights will be saved in hdf format using the hdf5 extension. The files can be found from the root of the project directory in data/bottleneck\_top\_models.}. This is best explained with a simple example. Consider the following string, "coco\_2017\_zmuv\_avg\_1x2048d5\_lr11\_b32". The first field, "coco", refers to the name of the dataset and "2017" is the subset (or version) of the dataset. The other fields follow directly from Table~\ref{tab:hyperparams}. "ZMUV" indicates zero-mean unit-variance scaling was used to normalize the input images. The $4^{th}$ field, "avg" denotes the use of global average pooling on the final layer of the base VGG16 model. This also describes the shape of the input to the top model. The next term, "1x2048d5" is a combination of 3 hyper-parameters that describe the fully connected layers in the top model. The "1x2048" indicates that there is 1 hidden layer and that it has "2048" nodes.  All fully connected layers are immediately followed by a ReLU activation layer which is then followed by either a dropout ("d") layer or a batch normalization ("bn") layer. For dropout, the number after the "d" indicates the percentage of nodes that get dropped. So "d3" would mean that only 30\% of the nodes are dropped. The second to last field gives information about the learning rate in the form "lrXY" which should be interpreted as $\mathrm{lr = X * 10^{-Y}}$.  So, lr53 would indicate a learning rate of 0.005, lr11 would be 0.1, and so forth. The final field, "b32" denotes the batch size.
 
-The first hyper-parameter we looked at was image preprocessing method. We compared the results between each method by looking at how they compared for each of the different classifier designs. In all cases, the ZMUV preprocessing method led to lower validation losses as seen in Fig.~\ref{fig:top_pp_pl_lve}. We also looked at how well the different classifier designs compared to each other. Looking again at Fig.~\ref{fig:top_pp_pl_lve} we can see that the 77 design performed much worse than the global max and global average pooling designs. To determine whether global max or global average pooling is better, we compare them against different layer sizes as shown in Fig.~\ref{fig:top_pl_sz_lve}. In all three cases the validation loss was lower when using global average pooling. In light of these preliminary results we will restrict the remaining hyperparameter tuning calculations to using only ZMUV to preprocess the images and global average pooling to cap off the end of the VGG16 pretrained model. A consequence of transfer learning is that the input shape of our top model will need to match the output shape of our base model. With global average pooling, this simplifies the input shape from $512\times7\times7$ features to $512\times1\times1$ features. This will greatly reduce the training time of our top model classifier and enable faster progress while we tune the remaining hyperparameters.
+The first hyper-parameter we looked at was the method for image preprocessing. We compared the results between each method by looking at how they compared for each of the different classifier designs. In all cases, the ZMUV preprocessing method led to lower validation losses as seen in Fig.~\ref{fig:top_pp_pl_lve}. We also looked at how well the different classifier designs compared to each other. Looking again at Fig.~\ref{fig:top_pp_pl_lve} we can see that the 77 design performed much worse than the global max and global average pooling designs. To determine whether global max or global average pooling is better, we compare them against different layer sizes as shown in Fig.~\ref{fig:top_pl_sz_lve}. In all three cases the validation loss was lower when using global average pooling. In light of these preliminary results we will restrict the remaining hyper-parameter tuning calculations to using only ZMUV to preprocess the images and global average pooling to cap off the end of the VGG16 pretrained model. A consequence of transfer learning is that the input shape of our top model will need to match the output shape of our base model. With global average pooling, this simplifies the input shape from $512\times7\times7$ features to $512\times1\times1$ features. This will greatly reduce the training time of our top model classifier and enable faster progress while we tune the remaining hyper-parameters.
 
 \begin{figure}%[!ht]
 \normalsize
@@ -1239,7 +1238,7 @@ The first hyper-parameter we looked at was image preprocessing method. We compar
 \includegraphics[width=\linewidth]{top_sz_lr_loss_vs_epoch}} \\
 \caption{Top model validation losses as a function of epoch. Each panel explores a different set of hyper-parameters. All results are for a mini batch size of 128. The colors are the same for same data in each plot.  For example, The teal curves in all three plots are of the same data. The shorter curves are a result of early stopping. Refer to Section~\ref{refine} for further details.}
 \label{fig:top2_nl_sz_lr}
-\vspace*{4pt}
+\vspace*{1pt}
 \end{figure}
 
 The results of Fig.~\ref{fig:top_pl_sz_lve} also suggest that there may exist a relationship between the validation loss and the layer size, namely that increasing the number of nodes per layer brings about lower validation losses. It worth noting that up until now we have been using a somewhat high learning rate of 0.1. The higher the learning rate the more the validation loss fluctuates from one training epoch to the next. This fact makes it hard to say one way or another which layer size is better. 
@@ -1253,18 +1252,18 @@ The results of Fig.~\ref{fig:top_pl_sz_lve} also suggest that there may exist a 
 \normalsize
 \label{fig:top_lr_bs_lvt}
 \includegraphics[width=0.49\linewidth]{top_lr_bs_loss_vs_time.png}}
-\caption{Top model validation losses as a function of (a) epoch and (b) time. The lr11 and lr52 correspond to 0.1 and 0.05 learning rates respectively.  In (b), We scaled the x-axis for each run by multiplying through the average training time per epoch.}
+\caption{Top model validation losses as a function of (a) epoch and (b) time. The lr11 and lr52 correspond to 0.1 and 0.05 learning rates respectively.  In (b), We scaled the x-axis for each run by multiplying through the average training time per epoch. The colors of the curves are matched up to help guide the eye.}
 \label{fig:top3_lr_bs}
-\vspace*{4pt}
+\vspace*{1pt}
 \end{figure*}
 
-In the rest of this section, we present the results from a grid search that we performed on the remaining top model hyperparameters, namely those listed under Table~\ref{tab:hyperparams} stage 1. The original VGG16 model has 3 dense fully connected layers. The first 2 layers are hidden and have 4096 nodes each. The last output layer has 1000 nodes equal to the number of classes in ImageNet. Since the COCO dataset consists of only 80 unique classes we will test the performance of using only a single hidden layer versus using two hidden layers. We would also like to see how different layer sizes (1024, 2048, and 4096) affect performance. The size of the hidden layers in VGG16 is 4096. Again, since we are working with only 80 classes, we may be able to get as good performance with smaller layer sizes. As we did before in Fig.~\ref{fig:top1_pp_pl_sz} we will use a learning rate of 0.1 but also compare how the performance changes when we cut the learning rate in half (e.g. 0.05). In general, the higher the learning rate, the faster the training time. If it appears from these preliminary results that we need to explore further smaller learning rates, we will do so on a case by case basis. The final hyperparameter for tuning our top model is the batch size. We will look at 3 sizes, 32, 64, and 128. The grid search on these four hyperparameters yields $2*3*2*3 = 32$ pretraining runs. For brevity, only a selection of these results are shown\footnote{See the Jupyter notebook for all 32 pretraining plots.}. 
+In the rest of this section, we present the results from a grid search that we performed on the remaining top model hyper-parameters, namely those listed under Table~\ref{tab:hyperparams} stage 1. The original VGG16 model has 3 dense fully connected layers. The first 2 layers are hidden and have 4096 nodes each. The last output layer has 1000 nodes equal to the number of classes in ImageNet. Since the COCO dataset consists of only 80 unique classes we will test the performance of using only a single hidden layer and compare it to that when we use 2 hidden layers. We would also like to see how different layer sizes (1024, 2048, and 4096) affect performance. The default size of the hidden layers in VGG16 is 4096. Again, since we are working with only 80 classes, we may be able to get as good performance with smaller layer sizes. As we did before in Fig.~\ref{fig:top1_pp_pl_sz} we will use a learning rate of 0.1 but also compare how the performance changes when we cut the learning rate in half (e.g. 0.05). In general, the higher the learning rate, the faster the training time. If it appears from these preliminary results that we need to explore further smaller learning rates, we will do so on a case by case basis. The final hyper-parameter for tuning our top model is the batch size. We will look at 3 sizes, 32, 64, 128, and on a few rare cases 256. The grid search on these four hyper-parameters yields $2*3*2*3 = 32$ pretraining runs. For brevity, only a selection of these results are shown\footnote{See the Jupyter notebook for all 32 pretraining plots.}. 
 
-The results shown of Fig.~\ref{fig:top2_nl_sz_lr} are all for a mini batch size of 128. In Fig.~\ref{fig:top_nl_sz_lve}, we compare how the number of hidden layers and the size of the hidden layers affects performance. For both the single and double layer cases validation loss decreases with increased layer size. Also, the losses for the double layer models are all lower than those of the single layer models. Next, in Fig.~\ref{fig:top_nl_lr_lve}, we hold the layer size fixed at 4096 nodes per layer and compare relationships between the number of layers and the learning rate. Independent of the learning rate, the double layer runs perform much better than the single layer runs. We also observe that the training runs with the higher learning rate start to flatten out a little faster than the others. This is typical as higher learning rates tend to find a local minimia quickly. In Fig.~\ref{fig:top_sz_lr_lve}, we hold the number of hidden layers fixed at 2 layers and compare the realtionship between number of nodes per layer and learning rate. As the number of nodes per layer increases the validation loss decreases. The validation loss was also lower in all cases where the larger learning rate was used. 
+The results shown of Fig.~\ref{fig:top2_nl_sz_lr} are all for a mini batch size of 128. In Fig.~\ref{fig:top_nl_sz_lve}, we compare how the number of hidden layers and the size of the hidden layers affects performance. For both the single and double layer cases validation loss decreases with increased layer size. Also, the losses for the double layer models are all lower than those of the single layer models. Next, in Fig.~\ref{fig:top_nl_lr_lve}, we hold the layer size fixed at 4096 nodes per layer and compare relationships between the number of layers and the learning rate. Independent of the learning rate, the double hidden layer runs perform much better than the single hidden layer runs. We also observe that the training runs with the higher learning rate start to flatten out a little faster than the others. This is typical as higher learning rates tend to find a local minimum quickly. In Fig.~\ref{fig:top_sz_lr_lve}, we hold the number of hidden layers fixed at 2 layers and compare the relationship between number of nodes per layer and learning rate. As the number of nodes per layer increases the validation loss decreases. The validation loss was also lower in all cases where the larger learning rate was used. 
 
 These results suggest better performance should be expected using 2 hidden layers with 4096 nodes per layer. Also, we can afford to use a little higher learning rate than we usually would. Typically, high learning rates tend to lead to overfitting. However, since the entropic capacity of the top model classifier is fairly low it does not have as strong a tendency to overfit.
 
-The final hyperparameter to optimize is the batch size. Using the results above, we set the number of layers to 2 and the number of nodes per layer to 4096. We plot the relationship between learning rate and batch size in Fig.~\ref{fig:top3_lr_bs}. In Fig.~\ref{fig:top_lr_bs_lve}, we see an interesting relationship.  The curves of training runs tend to overlap when both the learning rate and the batch size are both multiplied by the same constant factor (here 2 or $\nicefrac{1}{2}$ depending on how your perspective). The loss curves in Fig.~\ref{fig:top_lr_bs_lvt} are the same as those in Fig.~\ref{fig:top_lr_bs_lve} but plotted with respect to training time. From this perspective it appears that in order to train fast one needs only focus on setting the learning rate as high as possible without overfitting. Increasing the batch size can help smooth out the validation losses between epochs and consequently reduce overfitting.
+The final hyper-parameter to optimize is the batch size. Using the results above, we set the number of layers to 2 and the number of nodes per layer to 4096. We plot the relationship between learning rate and batch size in Fig.~\ref{fig:top3_lr_bs}. In Fig.~\ref{fig:top_lr_bs_lve}, we see an interesting relationship.  The curves of training runs tend to overlap when both the learning rate and the batch size are both multiplied by the same constant factor (here 2 or $\nicefrac{1}{2}$ depending on your perspective). The loss curves in Fig.~\ref{fig:top_lr_bs_lvt} are the same as those in Fig.~\ref{fig:top_lr_bs_lve} but plotted with respect to training time. From this perspective it appears that in order to train fast one needs only focus on setting the learning rate as high as possible without overfitting. Increasing the batch size can help smooth out the validation losses between epochs and consequently reduce overfitting.
 
 %data plots are slightly smoother for lower learning rate
 
@@ -1358,7 +1357,7 @@ It is not clear at this point what will be the best choice for our final model i
 %Is the final model reasonable and aligning with solution expectations? 
 
 %Are the final parameters of the model appropriate?
-We found that the best parameters for the model were 2 hidden layers with 4096 nodes per layer.  These parameters are appropriate as they are the same as those used in the original VGG16 model.  We also experimented with different batch sizes and learning rates however we did not notice any obvious correlations to the minimal loss. The minimal losses varied between $0.06 \pm 1\times 10^{-3}$. We evaluated each of our models on precision, recall, and $\mathrm{F_1}$ score.  Based on these evaluation metrics, the 2x4096d5\_lr11\_b256\_15\_lr11\_b128\_hwrszf~\footnote{We will refer to this model as our final multilabel (FML) model from here on.} model performed the best. Interestingly, this was our 8th best model in terms of minimal loss ($L = 0.0605$). 
+We found that the best parameters for the model were 2 hidden layers with 4096 nodes per layer.  These parameters are appropriate as they are the same as those used in the original VGG16 model.  We also experimented with different batch sizes and learning rates however we did not notice any obvious correlations to the minimal loss. The minimal losses varied between $0.06 \pm 1\times 10^{-3}$. We evaluated each of our models on precision, recall, and $\mathrm{F_1}$ score.  Based on these evaluation metrics, the 2x4096d5\_lr11\_b256\_15\_lr11\_b128\_hwrszf~\footnote{We will refer to this model as our final multi-label (FML) model from here on.} model performed the best. Interestingly, this was our 8th best model in terms of minimal loss ($L = 0.0605$). 
 
 %Has the final model been tested with various inputs to evaluate whether the model generalizes well to unseen data?
 We tested our final models against a subset of the 5000 images from the COCO 2017 validation set. The subset consisted of only those images with 1 or more labels. Images with zero labels were removed to help avoid divide-by-zero errors when calculating precision, recall, and $\mathrm{F_1}$. The final size of the test set was 4952. 
@@ -1410,14 +1409,55 @@ e. 4952 $\mathrm{(\tau = 0.378)}$ & 65.2 & 61.6 & 62.3 & 68.2 & 68.2 & 68.2 \\
 \end{tabular}
 \end{table}
 
-Quantitative results on MS-COCO are presented in Table~\ref{tab:PRF1}. A summary of previous works are provided in the top portion of the table and the results from our FML model are presented in the bottom portion. Since we are dealing with a multilabel dataset, the method we use to partition the model output into true/false predictions, also known as \textit{label decision} can affect the evaluation metrics (See Section~\ref{sec:metrics}). The first set of results, FML-a, were calculated using the top-k \textit{label decision} with $k=3$ (i.e. the 3 labels with the highest prediction score).  This is a widely used method.~\cite{WangYMHHX16,ZhuLOYW17}  However, for unbalanced datasets such as COCO, this type of \textit{label decision} may not be the best choice. According to Fig.~\ref{fig:coco_n_images_with_k_tags}, only 20\% of the validation data have exactly 3 labels, 50\% of the images have less than 3 labels and 30\% have more than 3. Thus for $k=3$ it is impossible to attain perfect precision and/or recall. The best possible results are given in the table on line "best possible".  With the exception of the first two references in Table~\ref{tab:PRF1}, our FML-a results perform worse compared to all previously published results. If we evaluate the FML model strictly on the 908 images which have exactly 3 labels, our results improve substantially (See line b.) Forcing the algorithm to predict a fixed number of labels for each image does not reflect well the algorithm's performance.
+Quantitative results on MS-COCO are presented in Table~\ref{tab:PRF1}. A summary of previous works are provided in the top portion of the table and the results from our FML model are presented in the bottom portion. Since we are dealing with a multi-label dataset, the method we use to partition the model output into true/false predictions, also known as \textit{label decision} can affect the evaluation metrics (See Section~\ref{sec:metrics}). The first set of results, FML-a, were calculated using the top-k \textit{label decision} with $k=3$ (i.e. the 3 labels with the highest prediction score).  This is a widely used method.~\cite{WangYMHHX16,ZhuLOYW17}  However, for unbalanced datasets such as COCO, this type of \textit{label decision} may not be the best choice. According to Fig.~\ref{fig:coco_n_images_with_k_tags}, only 20\% of the validation data have exactly 3 labels, 50\% of the images have less than 3 labels and 30\% have more than 3. Thus for $k=3$ it is impossible to attain perfect precision and/or recall. The best possible results are given in the table on line "best possible".  With the exception of the first two references in Table~\ref{tab:PRF1}, our FML-a results perform worse compared to all previously published results. If we evaluate the FML model strictly on the 908 images which have exactly 3 labels, our results improve substantially (See line b.) Forcing the algorithm to predict a fixed number of labels for each image does not reflect well the algorithm's performance.
+
+\begin{figure*}%[!t]
+\subfloat[][]{
+\label{fig:3179}
+\includegraphics[width=0.195\linewidth]{coco_valid_3179.png}}
+\subfloat[][]{
+\label{fig:2934}
+\includegraphics[width=0.195\linewidth]{coco_valid_2934.png}}
+\subfloat[][]{
+\label{fig:2510}
+\includegraphics[width=0.195\linewidth]{coco_valid_2510.png}}
+\subfloat[][]{
+\label{fig:4350}
+\includegraphics[width=0.195\linewidth]{coco_valid_4350.png}}
+\subfloat[][]{
+\label{fig:307}
+\includegraphics[width=0.195\linewidth]{coco_valid_307.png}}
+\caption{Sample images from COCO. See Tables~\ref{tab:coco_valid} for corresponding predictions and ground truth.}
+\label{fig:coco_valid}
+\vspace*{4pt}
+\end{figure*}
+
+\begin{table*}
+\caption{Ranked predictions from our model for Fig.~\ref{fig:coco_valid}. Ground truth labels are highlighted in bold.}
+\label{tab:coco_valid}
+\centering
+\begin{tabular}{cll|cll|cll|cll|cll}
+\toprule
+ & Fig.~\ref{fig:3179} & pred &  & Fig.~\ref{fig:2934} & pred     &  & Fig.~\ref{fig:2510} & pred     &  & Fig.~\ref{fig:4350} & pred &  & Fig.~\ref{fig:307} & pred \\
+\midrule
+1 & \textbf{tennis racket} & 1.00 & 1  &   \textbf{person} & 0.98 & 1  & person & 0.99 & 1 & person & 1.00 & 1 &          sheep & 0.52 \\
+2 &        \textbf{person} & 1.00 & 2  &      \textbf{car} & 0.90 & 2  &    dog & 0.57 & 5 & \textbf{tie} & 0.30 & 2 & \textbf{horse} & 0.48 \\
+3 &   \textbf{sports ball} & 0.81 & 3  &      \textbf{dog} & 0.77 & 3  &           sink & 0.25 & & & & & \\
+4 &           \textbf{car} & 0.02 & 4  &  \textbf{bicycle} & 0.59 & 4  &            cup & 0.24 & & & & & \\
+  &                        &      & 5  &     traffic light & 0.51 & 6  & \textbf{clock} & 0.23 & & & & & \\
+  &                        &      & 6  &           handbag & 0.39 & 7  & \textbf{chair} & 0.22 & & & & & \\
+  &                        &      & 8  &    \textbf{truck} & 0.26 & 14 &  \textbf{book} & 0.09 & & & & & \\
+  &                        &      & 10 & \textbf{backpack} & 0.24 & 20 &    \textbf{tv} & 0.07 & & & & & \\
+\bottomrule
+\end{tabular}
+\end{table*}
 
 One alternative to the top-k method is to instead output a variable number of labels for each image rather than a fixed number of labels for all images. An image with 5 ground truth labels would take the top-5 predictions as true whereas an image with only one ground truth label would only take the top prediction as true.  The results using this alternative method are given on line c of Table~\ref{tab:PRF1}. These results reflect better performance for our model than those previously calculated using a fixed $k$ value.
 
-Another method commonly used to partition the model output is to use a thresholding value to split the predictions. Predictions that are greater than the thresholding value are predicted as positive. This thresholding value, $\tau$, is commonly set to $\tau = 0.5$. While this value works well for multiclass (only 1 label per image) classification where the final layer is typically a softmax layer, it does not work well for a multilabel classifier. Here our final layer is a simple sigmoid layer and as such many labels can (and should) have higher than average activations.  What we would like to do is find an optimal value of $\tau$ such that we maximize both precision and recall. Using Eqn.~\ref{eq:lcard} and~\ref{eq:tau} we calculate the optimal value of $\tau = 0.378$ and record the results in line e of Table~\ref{tab:PRF1}. These results, while not quite as good as the per-image $k$ results, outperform our previous results as well as all the non-ResNet previously published results.
+Another method commonly used to partition the model output is to use a thresholding value to split the predictions. Predictions that are greater than the thresholding value are predicted as positive. This thresholding value, $\tau$, is commonly set to $\tau = 0.5$. While this value works well for multi-class (only 1 label per image) classification where the final layer is typically a softmax layer, it does not work well for a multi-label classifier. Here our final layer is a simple sigmoid layer and as such many labels can (and should) have higher than average activations.  What we would like to do is find an optimal value of $\tau$ such that we maximize both precision and recall. Using Eqn.~\ref{eq:lcard} and~\ref{eq:tau} we calculate the optimal value of $\tau = 0.378$ and record the results in line e of Table~\ref{tab:PRF1}. These results, while not quite as good as the per-image $k$ results, outperform our previous results as well as all the non-ResNet previously published results.
 
 %Is the model robust enough for the problem? Do small perturbations (changes) in training data or the input space greatly affect the results?
-As a final check for robustness, we run an augmented version of our test set through the model by applying random purturbations to each image. We apply up to 10\% zoom, shear, height shifts and width shifts. We also apply up to 10 degree rotation as well as horizontal flipping. We do the robustness test using per-image $k$ method and record the results in Table~\ref{tab:PRF1} line d. Even with distorted data, The model still performs very well only decreasing slightly in precision and recall.
+As a final check for robustness, we run an augmented version of our test set through the model by applying random perturbations to each image. We apply up to 10\% zoom, shear, height shifts and width shifts. We also apply up to 10 degree rotation as well as horizontal flipping. We do the robustness test using per-image $k$ method and record the results in Table~\ref{tab:PRF1} line d. Even with distorted data, The model still performs very well only decreasing slightly in precision and recall.
 
 %Can results found from the model be trusted?
 The results from our model can be trusted for the most part. However, newer, more innovative network architectures such as region proposal networks and RNN's have been shown to be more trustworthy.
@@ -1442,116 +1482,139 @@ The results from our model can be trusted for the most part. However, newer, mor
 %Is the visualization thoroughly analyzed and discussed? If a plot is provided, are the axes, title, and datum clearly defined?
 %Need 2 plots. one for typical loss/epoch overfitting and one with ours.
 
-\begin{figure*}%[!t]
-\subfloat[][]{
-\label{fig:3179}
-\includegraphics[width=0.24\linewidth]{coco_valid_3179.png}}
-\subfloat[][]{
-\label{fig:608}
-\includegraphics[width=0.24\linewidth]{coco_valid_608.png}}
-\subfloat[][]{
-\label{fig:483}
-\includegraphics[width=0.24\linewidth]{coco_valid_483.png}}
-\subfloat[][]{
-\label{fig:2934}
-\includegraphics[width=0.24\linewidth]{coco_valid_2934.png}}
-\caption{Sample images from COCO. See Tables~\ref{tab:3179},~\ref{tab:608},~\ref{tab:483}, and~\ref{tab:2934} for corresponding predictions and ground truth.}
-\label{fig:coco_valid}
-\vspace*{4pt}
-\end{figure*}
+In this section, we show some images from the MS-COCO dataset in Fig.~\ref{fig:coco_valid} and the corresponding annotations and predictions in Table~\ref{tab:coco_valid}. In Fig.~\ref{fig:3179} we show a correctly predicted image; even the faint car in the background is predicted with a very small value of 0.02. In Fig.~\ref{fig:2934} there are $k=6$ ground truth labels. The top 4 are predicted correctly but the model misses the truck and the backpack. Fig.~\ref{fig:2510},~\ref{fig:4350}, and~\ref{fig:307} are examples where the model failed to correctly predict anything.  There does actually appear to be a person in Fig.~\ref{fig:2510}. This label should be part of the ground truth. Interestingly, Fig.~\ref{fig:4350} has only one label, a tie, but it is easy to see how the model thinks it's a person. Everything about a person is there except the head.  Our model detects sheep instead of horses in the final sample image of Fig.~\ref{fig:307}. It is surprising that the model can detect anything at all; the horses are very tiny.
 
-In this section, we show some images from the MS-COCO dataset in Fig.~\ref{fig:coco_valid} and the corresponding annotations and predictions in Tables~\ref{tab:3179},~\ref{tab:608},~\ref{tab:483}, and~\ref{tab:2934}.
-
-
-\begin{table}
-\caption{Ranked predictions from our model for Fig.~\ref{fig:3179}. Ground truth labels are highlighted in bold.}
-\label{tab:3179}
-\centering
-\begin{tabular}{cll}
-\toprule
-rank &               label & pred \\
-\midrule
-1 & \textbf{tennis racket} & 0.999998 \\
-2 &        \textbf{person} & 0.999997 \\
-3 &   \textbf{sports ball} & 0.812335 \\
-4 &           \textbf{car} & 0.020007 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}
-\caption{Ranked predictions from our model for Fig.~\ref{fig:608}. Ground truth labels are highlighted in bold.}
-\label{tab:608}
-\centering
-\begin{tabular}{cll}
-\toprule
-rank &              label & pred \\
-\midrule
-1 &        \textbf{pizza} & 0.999812 \\
-2 & \textbf{dining table} & 0.988854 \\
-3 &        \textbf{chair} & 0.906406 \\
-4 &       \textbf{bottle} & 0.886304 \\
-5 &          \textbf{cup} & 0.870188 \\
-6 &       \textbf{person} & 0.861678 \\
-7 &                 knife & 0.810537 \\
-9 &   \textbf{wine glass} & 0.544246 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}
-\caption{Ranked predictions from our model for Fig.~\ref{fig:483}. Ground truth labels are highlighted in bold.}
-\label{tab:483}
-\centering
-\begin{tabular}{cll}
-\toprule
-rank &         label & pred \\
-\midrule
-1 &  \textbf{person} & 0.999982 \\
-2 &     \textbf{tie} & 0.933960 \\
-3 &       cell phone & 0.667491 \\
-4 & \textbf{handbag} & 0.470924 \\
-8 &     \textbf{car} & 0.058415 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}
-\caption{Ranked predictions from our model for Fig.~\ref{fig:2934}. Ground truth labels are highlighted in bold.}
-\label{tab:2934}
-\centering
-\begin{tabular}{cll}
-\toprule
-rank &           label & pred \\
-\midrule
-1  &   \textbf{person} & 0.977053 \\
-2  &      \textbf{car} & 0.895205 \\
-3  &      \textbf{dog} & 0.774094 \\
-4  &  \textbf{bicycle} & 0.588372 \\
-5  &     traffic light & 0.514701 \\
-6  &           handbag & 0.388943 \\
-8  &    \textbf{truck} & 0.263906 \\
-10 & \textbf{backpack} & 0.238688 \\
-\bottomrule
-\end{tabular}
-\end{table}
+%\begin{table}
+%\caption{Ranked predictions from our model for Fig.~\ref{fig:3179}. Ground truth labels are highlighted in bold.}
+%\label{tab:3179}
+%\centering
+%\begin{tabular}{cll}
+%\toprule
+%rank &               label & pred \\
+%\midrule
+%1 & \textbf{tennis racket} & 0.999998 \\
+%2 &        \textbf{person} & 0.999997 \\
+%3 &   \textbf{sports ball} & 0.812335 \\
+%4 &           \textbf{car} & 0.020007 \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
+%\begin{table}
+%\caption{Ranked predictions from our model for Fig.~\ref{fig:2934}. Ground truth labels are highlighted in bold.}
+%\label{tab:2934}
+%\centering
+%\begin{tabular}{cll}
+%\toprule
+%rank &           label & pred \\
+%\midrule
+%1  &   \textbf{person} & 0.977053 \\
+%2  &      \textbf{car} & 0.895205 \\
+%3  &      \textbf{dog} & 0.774094 \\
+%4  &  \textbf{bicycle} & 0.588372 \\
+%5  &     traffic light & 0.514701 \\
+%6  &           handbag & 0.388943 \\
+%8  &    \textbf{truck} & 0.263906 \\
+%10 & \textbf{backpack} & 0.238688 \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
+%\begin{table}
+%\caption{Ranked predictions from our model for Fig.~\ref{fig:2510}. Ground truth labels are highlighted in bold.}
+%\label{tab:2510}
+%\centering
+%\begin{tabular}{cll}
+%\toprule
+%rank &        label & pred \\
+%\midrule
+%1  &         person & 0.990732 \\
+%2  &            dog & 0.574209 \\
+%3  &           sink & 0.246699 \\
+%4  &            cup & 0.236690 \\
+%6  & \textbf{clock} & 0.226753 \\
+%7  & \textbf{chair} & 0.221450 \\
+%14 &  \textbf{book} & 0.091193 \\
+%20 &    \textbf{tv} & 0.072738 \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
+%\begin{table}
+%\caption{Ranked predictions from our model for Fig.~\ref{fig:4350}. Ground truth labels are highlighted in bold.}
+%\label{tab:4350}
+%\centering
+%\begin{tabular}{cll}
+%\toprule
+%rank &     label & pred \\
+%\midrule
+%1 &       person & 0.998929 \\
+%5 & \textbf{tie} & 0.296978 \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
+%\begin{table}
+%\caption{Ranked predictions from our model for Fig.~\ref{fig:307}. Ground truth labels are highlighted in bold.}
+%\label{tab:307}
+%\centering
+%\begin{tabular}{cll}
+%\toprule
+%rank &       label & pred \\
+%\midrule
+%1 &          sheep & 0.524227 \\
+%2 & \textbf{horse} & 0.475068 \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
+%\begin{table}
+%\caption{Ranked predictions from our model for Fig.~\ref{fig:608}. Ground truth labels are highlighted in bold.}
+%\label{tab:608}
+%\centering
+%\begin{tabular}{cll}
+%\toprule
+%rank &              label & pred \\
+%\midrule
+%1 &        \textbf{pizza} & 0.999812 \\
+%2 & \textbf{dining table} & 0.988854 \\
+%3 &        \textbf{chair} & 0.906406 \\
+%4 &       \textbf{bottle} & 0.886304 \\
+%5 &          \textbf{cup} & 0.870188 \\
+%6 &       \textbf{person} & 0.861678 \\
+%7 &                 knife & 0.810537 \\
+%9 &   \textbf{wine glass} & 0.544246 \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
+%\begin{table}
+%\caption{Ranked predictions from our model for Fig.~\ref{fig:483}. Ground truth labels are highlighted in bold.}
+%\label{tab:483}
+%\centering
+%\begin{tabular}{cll}
+%\toprule
+%rank &         label & pred \\
+%\midrule
+%1 &  \textbf{person} & 0.999982 \\
+%2 &     \textbf{tie} & 0.933960 \\
+%3 &       cell phone & 0.667491 \\
+%4 & \textbf{handbag} & 0.470924 \\
+%8 &     \textbf{car} & 0.058415 \\
+%\bottomrule
+%\end{tabular}
+%\end{table}
 
 \subsection{Reflection}
 %In this section, you will summarize the entire end-to-end problem solution and discuss one or two particular aspects of the project you found interesting or difficult. You are expected to reflect on the project as a whole to show that you have a firm understanding of the entire process employed in your work. Questions to ask yourself when writing this section:
 
 % Have you thoroughly summarized the entire process you used for this project?
 
-To summarize the project we used transfer learning to create a multilabel classifier trained on the MS-COCO dataset.  We started with a VGG16 neural network trained on ImageNet as our base model and replaced the final fully connected layers with a classifier pretrained using bottleneck features.  
+To summarize the project we used transfer learning to create a multi-label classifier trained on the MS-COCO dataset.  We started with a VGG16 neural network trained on ImageNet as our base model and replaced the final fully connected layers with a classifier pretrained using bottleneck features.  
 
 % Were there any interesting aspects of the project?
 
-During both training and pretraining the validation accuracy was always high between 96\% and 98\%. Accuracy is (true posititives + true negatives) / (total population).  There are $5000*80=400000$ total possibilities for positive labels in the population but there are only 14631 ground truth positives.  This means that in the worst case scenario, if we predicted all negatives, we would still wind up with an accuracy of 96.34\%. This is a great example of how accuracy can be a very misleading metric. As such, we did not use this metric in the project.
+During both training and pretraining the validation accuracy was always high between 96\% and 98\%. Accuracy is (true positives + true negatives) / (total population).  There are $5000*80=400000$ total possibilities for positive labels in the population but there are only 14631 ground truth positives.  This means that in the worst case scenario, if we predicted all negatives, we would still wind up with an accuracy of 96.34\%. This is a great example of how accuracy can be a very misleading metric. As such, we did not use this metric in the project.
 
 %Were there any difficult aspects of the project?
 
 %Does the final model and solution fit your expectations for the problem, and should it be used in a general setting to solve these types of problems?
 
-We explored a wide range of hyperparameters and while some of them were presented a greater challenge in terms of optimization, we did not feel that the overall task was necessarily difficult. Our final model We were able to do better than some groups but not every group. It seems that the best models for multilabel classification are those which incorporate region proposal networks and/or some flavor of RNN.
+We explored a wide range of hyper-parameters and while some of them were presented a greater challenge in terms of optimization, we did not feel that the overall task was necessarily difficult. Our final model We were able to do better than some groups but not every group. It seems that the best models for multi-label classification are those which incorporate region proposal networks and/or some flavor of RNN.
 % \cite yolo and faster-rcnn and cnn-rnn and resnet-SRN
 
 \subsection{Improvement}
@@ -1563,24 +1626,23 @@ We take a very naive approach to creating the labels for the COCO dataset.  Spec
 
 % Were there algorithms or techniques you researched that you did not know how to implement, but would consider using if you knew how?
 
-It would have been interesting to explore the label-to-label hierarchial relationships using WordNet and use those relationships to incorporate either a word2vec type embedding layer or an RNN based on the hierarchial sequences.  Also, incorporation of region proposal networks using either bounding boxes or segmentation maps would have been useful.  It would also have been interesting to see how zcf whitening might affect our training.  However, with such a large dataset as COCO, we didn't have the computational capacity to perform the SVD.
+It would have been interesting to explore the label-to-label hierarchical relationships using WordNet and use those relationships to incorporate either a word2vec type embedding layer or an RNN based on the hierarchical sequences.  Also, incorporation of region proposal networks using either bounding boxes or segmentation maps would have been useful.  It would also have been interesting to see how zcf whitening might affect our training.  However, with such a large dataset as COCO, we didn't have the computational capacity to perform the necessary SVD.
 
-If you used your final solution as the new benchmark, do you think an even better solution exists?
+%If you used your final solution as the new benchmark, do you think an even better solution exists?
 
------------
+%-----------
 
-Before submitting, ask yourself...
-\begin{itemize}
+%Before submitting, ask yourself...
+%\begin{itemize}
 
 %  \item Does the project report you’ve written follow a well-organized structure similar to that of the project template?
-  \item Is each section (particularly \textbf{Analysis} and \textbf{Methodology}) written in a clear, concise and specific fashion? Are there any ambiguous terms or phrases that need clarification?
-  \item Would the intended audience of your project be able to understand your analysis, methods, and results?
-  \item Have you properly proof-read your project report to assure there are minimal grammatical and spelling mistakes?
-  \item Are all the resources used for this project correctly cited and referenced?
-  \item Is the code that implements your solution easily readable and properly commented?
+%  \item Is each section (particularly \textbf{Analysis} and \textbf{Methodology}) written in a clear, concise and specific fashion? Are there any ambiguous terms or phrases that need clarification?
+%  \item Would the intended audience of your project be able to understand your analysis, methods, and results?
+%  \item Have you properly proof-read your project report to assure there are minimal grammatical and spelling mistakes?
+%  \item Are all the resources used for this project correctly cited and referenced?
+%  \item Is the code that implements your solution easily readable and properly commented?
 %  \item Does the code execute without error and produce results similar to those reported?
-
-\end{itemize}
+%\end{itemize}
 
 %example~\cite{Sechidis2011}
 
@@ -1617,22 +1679,22 @@ Before submitting, ask yourself...
 
 
 % use section* for acknowledgement
-\ifCLASSOPTIONcompsoc
+%\ifCLASSOPTIONcompsoc
 % The Computer Society usually uses the plural form
-  \section*{Acknowledgments}
-\else
+%  \section*{Acknowledgments}
+%\else
 % regular IEEE prefers the singular form
-  \section*{Acknowledgment}
-\fi
+%  \section*{Acknowledgment}
+%\fi
 
-The authors would like to thank...
+%The authors would like to thank...
 
 
 % Can use something like this to put references on a page
 % by themselves when using endfloat and the captionsoff option.
-\ifCLASSOPTIONcaptionsoff
-  \newpage
-\fi
+%\ifCLASSOPTIONcaptionsoff
+%  \newpage
+%\fi
 
 % trigger a \newpage just before the given reference
 % number - used to balance the columns on the last page
