@@ -417,7 +417,7 @@
 
 
 \usepackage{booktabs}
-
+\usepackage{nicefrac}
 
 % *** PDF, URL AND HYPERLINK PACKAGES ***
 %
@@ -853,7 +853,7 @@ The problem that we will try to solve is finding multiple features (or labels) i
 \normalsize
 \includegraphics[width=\linewidth]{mscoco_label_counts.png}
 \caption{Number of samples in MS-COCO containing at least one instance of a label.}
-\label{coco_label_counts}
+\label{fig:coco_label_counts}
 \vspace*{4pt}
 \end{figure*}
 
@@ -962,10 +962,12 @@ Typically this value is set to 0.5 and is a logical choice for multiclass classi
 
 \begin{equation}
 \mathrm{LCard} = \frac{1}{N}\sum_{i=1}^{N}\sum_{j=1}^{L}y_{ij}
+\label{eq:lcard}
 \end{equation}
 
 \begin{equation}
 \tau = \mathrm{argmin}\left\|\left(\mathrm{LCard}-\frac{1}{N}\sum_{i=1}^{N}\sum_{j=1}^{L}1_{h_{ij} \geq \tau}\right)\right\|
+\label{eq:tau}
 \end{equation}
 When comparing our model to the benchmark models, we will use Eqns~\ref{eq:MP} through~\ref{eq:mF1}. When comparing the results of our model to those previously reported in the literature, we will restrict ourselves to using only those metrics for which there is a direct comparison to the previous work.
 
@@ -1117,12 +1119,12 @@ For this study we will use the (2017) MS-COCO\cite{MSCOCO} dataset as our primar
 \normalsize
 \includegraphics[width=\linewidth]{mscoco_n_images_with_k_tags.png}
 \caption{Number of unique labels per sample in MS-COCO.}
-\label{coco_n_images_with_k_tags}
+\label{fig:coco_n_images_with_k_tags}
 \vspace*{4pt}
 \end{figure*}
 
-In Fig.~\ref{coco_label_counts}, we can see that the dominating class label is \textit{person} with 64115 occurances in the training set and 2693 in the validation set. The least dominating class labels are the \textit{toaster} and \textit{hair drier} with 217 and 189 in the training set and 8 and 9 in the validation set, respectively.
-In Fig.~\ref{coco_n_images_with_k_tags}, we show the number of unique tags per sample.  The majority of the samples have at least 1 to 4 unique labels with 2 unique labels being the most dominate.  We also notice that the training and testing sets have 1021 and 48 samples with no labels. We will keep this fact in mind when running our evaluation metrics.
+In Fig.~\ref{fig:coco_label_counts}, we can see that the dominating class label is \textit{person} with 64115 occurances in the training set and 2693 in the validation set. The least dominating class labels are the \textit{toaster} and \textit{hair drier} with 217 and 189 in the training set and 8 and 9 in the validation set, respectively.
+In Fig.~\ref{fig:coco_n_images_with_k_tags}, we show the number of unique tags per sample. The majority of the samples have at least 1 to 4 unique labels with 2 unique labels being the most dominate. We also notice that the training and testing sets have 1021 and 48 samples with no labels. We will keep this fact in mind when running our evaluation metrics.
 In both figures, the training set has 20 to 30 times more samples per label than the validation set and the ratios between the training and validation sets are consistent (i.e. the heights of the train and valid bars are about the same.)
 
 \subsection{Algorithms and Techniques}\label{sec:algo}
@@ -1132,34 +1134,36 @@ In both figures, the training set has 20 to 30 times more samples per label than
 %Are the techniques to be used thoroughly discussed and justified?
 %Is it made clear how the input data or datasets will be handled by the algorithms and techniques chosen?
 
-To solve this problem, we will model our classifier using a deep convolutional neural net.  We will not train our model from scratch, but rather we will perform transfer learning using the VGG16 convnet trained on imagenet.  We will read the images from disk and perform data augmentation using worker threads.  This will make it so the GPU doesn't have to wait on batches thereby maximizing our training efficiency. We will use sigmoid activation in the output layer~\cite{Kurata:2016}, binary cross entropy for our loss function~\cite{deBoer2005} and mini-batch stochastic gradient descent with momentum for backpropogation. Table~\ref{tab:hyperparams} outlines the hyperparameters that will be tuned to optimize the classifier.
+To solve this problem, we will model our classifier using a deep convolutional neural net. We will not train our model from scratch, but rather we will perform transfer learning using the VGG16 convnet trained on imagenet. We will read the images from disk and perform data augmentation using worker threads. This will make it so the GPU doesn't have to wait on batches thereby maximizing our training efficiency. We will use sigmoid activation in the output layer~\cite{Kurata:2016}, binary cross entropy for our loss function~\cite{deBoer2005} and mini-batch stochastic gradient descent with momentum for backpropogation. Table~\ref{tab:hyperparams} outlines the hyperparameters that will be tuned to optimize the classifier.
 \begin{table}
-\caption{List of hyperparameters to tune to optimize the classifier.  There are 2 options for image preprocessing that is used by both Stage 1 and 2: inet - use a global scaling factor and zmuv - use per-image zero-mean unit-variance.  Stage 1 is where the top model gets trained with bottleneck features.
+\caption{List of hyperparameters to tune to optimize the classifier. There are 2 options for image preprocessing that is used by both Stage 1 and 2: inet - use a global scaling factor and zmuv - use per-image zero-mean unit-variance.  Stage 1 is where the top model gets trained with bottleneck features.
 %BN stands for Batch Normalization.
 We train the entire model (base + top) in Stage 2.  Please refer to Sec.~\ref{sec:method} for more details. Note: Batch sizes of 256 will be used only for a few select cases.}
 \label{tab:hyperparams}
+\centering
 \begin{tabular}{cll}
-%\centering
-%\toprule
-\hline
+\toprule
+%\hline
 Stage & Hyper-parameter & Variants \\
-%\midrule
-\hline
+\midrule
+%\hline
  & Image Preprocessing & INET, ZMUV \\
-\hline
+\midrule
+%\hline
 1 & Classifier Design & 77, avg, max \\
 1 & Number of Hidden FC Layers & 1 or 2 \\
 1 & Number of Nodes per Layer & 1024, 2048, 4096 \\
 %1 & Regularization Method & BN or Dropout \\
 1 & Learning Rate & 0.1, 0.05\\
 1 & Batch Size & 32, 64, 128, 256\\
-\hline
+\midrule
+%\hline
 2 & Number of Frozen Layers & 15, All \\
 2 & Learning Rate & \\
 2 & Batch Size & 32, 64, 128, 256 \\
 2 & Data Augmentation & h, w, r, s, z, f \\
-%\bottomrule
-\hline
+\bottomrule
+%\hline
 \end{tabular}
 \end{table}
 We will also use some Keras callbacks during our training.  ModelCheckpoint to save only the best models at each epoch, EarlyStopping to stop training when we stop making progress and CSVLogger for plotting purposes.
@@ -1184,7 +1188,6 @@ We were unable to find a VGG16 model trained on COCO to use for benchmarking pur
 There are 2 types of preprocessing we do on the image data. The first is image resizing and normalizing. Before passing any image through the network it must first be resized to match the height and width of the input layer and its values must be converted (normalized) from uint8's to float32's in the range of -1 and 1.  The method by which the images are normalized became a tunable hyperparameter.  Keras comes shipped with a preprocess\_image\footnote{\url{https://github.com/keras-team/keras/blob/master/keras/applications/imagenet_utils.py}} function that is intended to be used for data normalization on VGG16.  If using Keras with the Tensorflow backend this normalization boils down to dividing by 127.5 and then subtracting by 1 for every image.  This is the INET option in Table~\ref{tab:hyperparams}. As an alternate option, the various flavors of model generators in Keras provide to option to normalize images by either featurewise or samplewise zero-mean unit-variance (or ZMUV).  These three normalization methods each provide slightly different results and so we leave the decision as to which one is best as a tunable hyperparameter.\footnote{This part of the study raised an interesting question. Should the input image normalization method be part of the (or be supplied as) supplemental information to the saved model?  In other words, if I download and use a trained model, should I not also expect the model to somehow tell me in what format the model expects the input data to be? There seemed to be conflicting opinions as to which normalizing method should be used.}
 
 The other type of image preprocessing involves various forms of data augmentation.  Going by the codes in Table~\ref{tab:hyperparams} we will augment the image data by (h) shifting along the height direction, (w) shift along the width direction, (r) performing random rotation, (s) skew transform, (z) multiplying by a zoom factor, and (f) performing horizontal flips.  We will also shuffle the training data after each epoch. We will only perform data augmentation during training, not during top model training as the input images to the top model aren't images but rather features of a deep layer.
-
 
 \subsection{Implementation}
 %In this section, the process for which metrics, algorithms, and techniques that you implemented for the given data will need to be clearly documented. It should be abundantly clear how the implementation was carried out, and discussion should be made regarding any complications that occurred during this process. Questions to ask yourself when writing this section:
@@ -1250,7 +1253,7 @@ The results of Fig.~\ref{fig:top_pl_sz_lve} also suggest that there may exist a 
 \normalsize
 \label{fig:top_lr_bs_lvt}
 \includegraphics[width=0.49\linewidth]{top_lr_bs_loss_vs_time.png}}
-\caption{Top model validation losses as a function of (a) Epoch and (b) Time. The lr11 and lr52 correspond to 0.1 and 0.05 learning rates respectively.  In (b), We scaled the x-axis for each run by multiplying through the average training time per epoch.}
+\caption{Top model validation losses as a function of (a) epoch and (b) time. The lr11 and lr52 correspond to 0.1 and 0.05 learning rates respectively.  In (b), We scaled the x-axis for each run by multiplying through the average training time per epoch.}
 \label{fig:top3_lr_bs}
 \vspace*{4pt}
 \end{figure*}
@@ -1261,7 +1264,7 @@ The results shown of Fig.~\ref{fig:top2_nl_sz_lr} are all for a mini batch size 
 
 These results suggest better performance should be expected using 2 hidden layers with 4096 nodes per layer. Also, we can afford to use a little higher learning rate than we usually would. Typically, high learning rates tend to lead to overfitting. However, since the entropic capacity of the top model classifier is fairly low it does not have as strong a tendency to overfit.
 
-The final hyperparameter to optimize is the batch size. Using the results above, we set the number of layers to 2 and the number of nodes per layer to 4096. We plot the relationship between learning rate and batch size in Fig.~\ref{fig:top3_lr_bs}. In Fig.~\ref{fig:top_lr_bs_lve}, we see an interesting relationship.  The curves of training runs tend to overlap when both the learning rate and the batch size are both multiplied by the same constant factor (here 2 or $\nicefrac{1}{2}$). The loss curves in Fig.~\ref{fig:top_lr_bs_lvt} are the same as those in Fig.~\ref{fig:top_lr_bs_lve} but plotted with respect to training time. From this perspective it appears that in order to train fast one needs only focus on setting the learning rate as high as possible without overfitting. Increasing the batch size can help smooth out the validation losses between epochs and consequently reduce overfitting.
+The final hyperparameter to optimize is the batch size. Using the results above, we set the number of layers to 2 and the number of nodes per layer to 4096. We plot the relationship between learning rate and batch size in Fig.~\ref{fig:top3_lr_bs}. In Fig.~\ref{fig:top_lr_bs_lve}, we see an interesting relationship.  The curves of training runs tend to overlap when both the learning rate and the batch size are both multiplied by the same constant factor (here 2 or $\nicefrac{1}{2}$ depending on how your perspective). The loss curves in Fig.~\ref{fig:top_lr_bs_lvt} are the same as those in Fig.~\ref{fig:top_lr_bs_lve} but plotted with respect to training time. From this perspective it appears that in order to train fast one needs only focus on setting the learning rate as high as possible without overfitting. Increasing the batch size can help smooth out the validation losses between epochs and consequently reduce overfitting.
 
 %data plots are slightly smoother for lower learning rate
 
@@ -1349,80 +1352,189 @@ It is not clear at this point what will be the best choice for our final model i
 
 
 \section{Results} % approx. 2-3 pages
-\subsection{Model Evaluation and Validation}\label{sec:eval}
-In this section, the final model and any supporting qualities should be evaluated in detail. It should be clear how the final model was derived and why this model was chosen. In addition, some type of analysis should be used to validate the robustness of this model and its solution, such as manipulating the input data or environment to see how the model’s solution is affected (this is called sensitivity analysis). Questions to ask yourself when writing this section:
+\subsection{Model Evaluation, Validation and Justification}\label{sec:eval}
+%In this section, the final model and any supporting qualities should be evaluated in detail. It should be clear how the final model was derived and why this model was chosen. In addition, some type of analysis should be used to validate the robustness of this model and its solution, such as manipulating the input data or environment to see how the model’s solution is affected (this is called sensitivity analysis). Questions to ask yourself when writing this section:
 
-Is the final model reasonable and aligning with solution expectations? Are the final parameters of the model appropriate?
+%Is the final model reasonable and aligning with solution expectations? 
 
-Has the final model been tested with various inputs to evaluate whether the model generalizes well to unseen data?
+%Are the final parameters of the model appropriate?
+We found that the best parameters for the model were 2 hidden layers with 4096 nodes per layer.  These parameters are appropriate as they are the same as those used in the original VGG16 model.  We also experimented with different batch sizes and learning rates however we did not notice any obvious correlations to the minimal loss. The minimal losses varied between $0.06 \pm 1\times 10^{-3}$. We evaluated each of our models on precision, recall, and $\mathrm{F_1}$ score.  Based on these evaluation metrics, the 2x4096d5\_lr11\_b256\_15\_lr11\_b128\_hwrszf~\footnote{We will refer to this model as our final multilabel (FML) model from here on.} model performed the best. Interestingly, this was our 8th best model in terms of minimal loss ($L = 0.0605$). 
 
-Is the model robust enough for the problem? Do small perturbations (changes) in training data or the input space greatly affect the results?
-
-Can results found from the model be trusted?
-
-\subsection{Justification}
-In this section, your model’s final solution and its results should be compared to the benchmark you established earlier in the project using some type of statistical analysis. You should also justify whether these results and the solution are significant enough to have solved the problem posed in the project. Questions to ask yourself when writing this section:
-
-Are the final results found stronger than the benchmark result reported earlier?
-
-Have you thoroughly analyzed and discussed the final solution?
-
-Is the final solution significant enough to have solved the problem?
-
+%Has the final model been tested with various inputs to evaluate whether the model generalizes well to unseen data?
+We tested our final models against a subset of the 5000 images from the COCO 2017 validation set. The subset consisted of only those images with 1 or more labels. Images with zero labels were removed to help avoid divide-by-zero errors when calculating precision, recall, and $\mathrm{F_1}$. The final size of the test set was 4952. 
 
 \begin{table}
-\caption{Comparisons on MS-COCO validation dataset for $k=3$. The macro precision $\mathrm{MP}$, macro recall $\mathrm{MR}$, and macro $\mathrm{F}$ score $\mathrm{MF_1}$ are evaluated for each label class before averaging.  The micro precision $\mathrm{\mu P}$, micro recall $\mathrm{\mu R}$, and micro $\mathrm{F}$ score $\mathrm{\mu F_1}$ are averaged over all instance-label pairs.}
+\caption{Comparisons on MS-COCO validation dataset for $k=3$. The macro precision $\mathrm{MP}$, macro recall $\mathrm{MR}$, and macro $\mathrm{F}$ score $\mathrm{MF_1}$ are evaluated for each label class before averaging.  The micro precision $\mathrm{\mu P}$, micro recall $\mathrm{\mu R}$, and micro $\mathrm{F}$ score $\mathrm{\mu F_1}$ are averaged over all image-label pairs. Our final model (FML) results (2x4096d5\_lr11\_b256\_15\_lr11\_b128\_hwrszf) are provided in the bottom half of the table.}
 \label{tab:PRF1}
+\centering
 \begin{tabular}{lllllll}
-%\centering
-%\toprule
-\hline
+\toprule
 Method & $\mathrm{MP}$ & $\mathrm{MR}$ & $\mathrm{MF_1}$ & $\mathrm{\mu P}$ & $\mathrm{\mu R}$ & $\mathrm{\mu F_1}$ \\
-%\midrule
-\hline
+\midrule
 KNN~\cite{nus-wide-civr09}    & 32.6 & 19.3 & 24.3 & 42.9 & 53.4 & 47.6 \\
 WARP~\cite{GongJLTI13}        & 59.3 & 52.5 & 55.7 & 59.8 & 61.4 & 60.7 \\
 Softmax~\cite{WangYMHHX16}    & 59.0 & 57.0 & 58.0 & 60.2 & 62.1 & 61.1 \\
 BCE~\cite{WangYMHHX16}        & 59.3 & 58.6 & 58.9 & 61.7 & 65.0 & 63.3 \\
 No RNN~\cite{WangYMHHX16}     & 65.3 & 54.5 & 59.3 & 68.5 & 61.3 & 65.7 \\
 CNN-RNN~\cite{WangYMHHX16}    & 66.0 & 55.6 & 60.4 & 69.2 & 66.4 & 67.8 \\
-\hline
 ResNet-101~\cite{HeZRS15}     & 84.3 & 57.4 & 65.9 & 86.5 & 61.3 & 71.7 \\
 ResNet-107~\cite{ZhuLOYW17}   & 84.4 & 57.6 & 66.1 & 86.4 & 61.4 & 71.8 \\
 ResNet-101-s~\cite{ZhuLOYW17} & 84.3 & 57.7 & 66.2 & 86.3 & 61.8 & 72.0 \\
-ResNet-SRN-a~\cite{ZhuLOYW17} & 85.8 & 57.5 & 66.3 & 88.1 & 61.1 & 72.1 \\
+ResNet-SRNa~\cite{ZhuLOYW17} & 85.8 & 57.5 & 66.3 & 88.1 & 61.1 & 72.1 \\
 ResNet-SRN~\cite{ZhuLOYW17}   & 85.2 & 58.8 & 67.4 & 87.4 & 62.5 & 72.9 \\
-\hline
-             & 56.7 & 55.7 & 54.1 & 60.3 & 61.3 & 60.8 \\ % 2x2048d5_lr11_b32_15_lr52_b128_hwrszf ~500s
-             & 56.8 & 55.6 & 54.1 & 60.4 & 61.3 & 60.9 \\ % 2x2048d5_lr11_b32_15_lr32_b128_hwrszf ~500s
-             & 56.0 & 55.6 & 53.9 & 60.1 & 61.0 & 60.6 \\ % 2x2048d5_lr11_b32_15_lr12_b128_hwrszf ~500s
-             & 55.2 & 54.3 & 52.8 & 59.6 & 60.5 & 60.0 \\ % 2x2048d5_lr11_b32_15_lr53_b128_hwrszf ~500s
-             & 52.7 & 52.2 & 50.5 & 58.2 & 59.1 & 58.6 \\ % 2x2048d5_lr11_b32_15_lr13_b128_hwrszf ~500s
-\hline
-             & 55.5 & 54.6 & 53.0 & 59.7 & 60.6 & 60.1 \\ % 2x4096d5_lr11_b32_15_lr53_b128_hwrszf ~450-550
-             & 56.1 & 55.2 & 53.7 & 59.9 & 60.8 & 60.4 \\ % 2x4096d5_lr11_b32_15_lr52_b128_hwrszf
-             & 56.0 & 54.7 & 53.2 & 59.9 & 60.8 & 60.4 \\ % 2x4096d5_lr11_b32_15_lr12_b128_hwrszf
-             & 54.5 & 55.8 & 53.2 & 60.0 & 60.8 & 60.3 \\ % 2x4096d5_lr11_b32_15_lr11_b128_f
-             & 54.9 & 55.4 & 53.1 & 60.2 & 61.1 & 60.7 \\ % 2x4096d5_lr11_b32_15_lr52_b128_f
-             & 56.8 & 56.0 & 54.5 & 60.4 & 61.1 & 60.9 \\ % 2x4096d5_lr11_b128_15_lr52_b128_hwrszf ~442s
-             & 59.2 & 58.5 & 57.6 & 69.4 & 69.4 & 69.4 \\ % 2x4096d5_lr11_b128_15_lr52_b128_hwrszf k==3 908
-             & 65.2 & 45.4 & 51.4 & 75.4 & 51.5 & 61.2 \\ % 2x4096d5_lr11_b128_15_lr52_b128_hwrszf k>=3 2405
-%\bottomrule
-\hline
+\midrule
+best possible                 & 67.2 & 78.4 & 70.8 & 76.0 & 77.1 & 76.5 \\
+\midrule % 2x4096d5_lr11_b256_15_lr11_b128_hwrszf
+FML  & & & & & & \\
+a. 4952 $\mathrm{(k > 0)}$       & 57.3 & 56.0 & 54.6 & 60.6 & 61.5 & 61.0 \\
+%b. 4952-aug $\mathrm{(k > 0)}$   & 55.9 & 55.5 & 53.6 & 60.0 & 60.9 & 60.4 \\
+b. 908 $\mathrm{(k = 3)}$       & 61.2 & 59.3 & 59.1 & 69.9 & 69.9 & 69.9 \\
+c. 4952 $\mathrm{(k = L/I)}$     & 66.9 & 63.1 & 64.2 & 70.5 & 70.5 & 70.5 \\
+d. 4952-a $\mathrm{(k = L/I)}$ & 65.6 & 62.9 & 63.6 & 69.8 & 69.8 & 69.8 \\
+e. 4952 $\mathrm{(\tau = 0.378)}$ & 65.2 & 61.6 & 62.3 & 68.2 & 68.2 & 68.2 \\
+%\midrule % 2x2048d5_lr11_b32_15_lr??_b128_hwrszf ~500s
+%$\mathrm{lr = 0.001}$         & 52.7 & 52.2 & 50.5 & 58.2 & 59.1 & 58.6 \\
+%$\mathrm{lr = 0.005}$         & 55.2 & 54.3 & 52.8 & 59.6 & 60.5 & 60.0 \\
+%$\mathrm{lr = 0.01}$          & 56.0 & 55.6 & 53.9 & 60.1 & 61.0 & 60.6 \\
+%$\mathrm{lr = 0.03}$          & 56.8 & 55.6 & 54.1 & 60.4 & 61.3 & 60.9 \\
+%$\mathrm{lr = 0.05}$          & 56.7 & 55.7 & 54.1 & 60.3 & 61.3 & 60.8 \\
+%\midrule % 2x4096d5_lr11_b32_15_lr??_b128_hwrszf ~450-550
+%$\mathrm{lr = 0.005}$         & 55.5 & 54.6 & 53.0 & 59.7 & 60.6 & 60.1 \\
+%$\mathrm{lr = 0.01}$          & 56.0 & 54.7 & 53.2 & 59.9 & 60.8 & 60.4 \\
+%$\mathrm{lr = 0.05}$          & 56.1 & 55.2 & 53.7 & 59.9 & 60.8 & 60.4 \\
+%\midrule % 2x4096d5_lr11_b128_15_lr52_b128_hwrszf ~442s
+%5000                          & 56.8 & 56.0 & 54.5 & 60.4 & 61.1 & 60.9 \\
+%2405 $\mathrm{(k >= 3)}$      & 65.2 & 45.4 & 51.4 & 75.4 & 51.5 & 61.2 \\
+%908 $\mathrm{(k = 3)}$        & 59.2 & 58.5 & 57.6 & 69.4 & 69.4 & 69.4 \\
+\bottomrule
 \end{tabular}
 \end{table}
+
+Quantitative results on MS-COCO are presented in Table~\ref{tab:PRF1}. A summary of previous works are provided in the top portion of the table and the results from our FML model are presented in the bottom portion. Since we are dealing with a multilabel dataset, the method we use to partition the model output into true/false predictions, also known as \textit{label decision} can affect the evaluation metrics (See Section~\ref{sec:metrics}). The first set of results, FML-a, were calculated using the top-k \textit{label decision} with $k=3$ (i.e. the 3 labels with the highest prediction score).  This is a widely used method.~\cite{WangYMHHX16,ZhuLOYW17}  However, for unbalanced datasets such as COCO, this type of \textit{label decision} may not be the best choice. According to Fig.~\ref{fig:coco_n_images_with_k_tags}, only 20\% of the validation data have exactly 3 labels, 50\% of the images have less than 3 labels and 30\% have more than 3. Thus for $k=3$ it is impossible to attain perfect precision and/or recall. The best possible results are given in the table on line "best possible".  With the exception of the first two references in Table~\ref{tab:PRF1}, our FML-a results perform worse compared to all previously published results. If we evaluate the FML model strictly on the 908 images which have exactly 3 labels, our results improve substantially (See line b.) Forcing the algorithm to predict a fixed number of labels for each image does not reflect well the algorithm's performance.
+
+One alternative to the top-k method is to instead output a variable number of labels for each image rather than a fixed number of labels for all images. An image with 5 ground truth labels would take the top-5 predictions as true whereas an image with only one ground truth label would only take the top prediction as true.  The results using this alternative method are given on line c of Table~\ref{tab:PRF1}. These results reflect better performance for our model than those previously calculated using a fixed $k$ value.
+
+Another method commonly used to partition the model output is to use a thresholding value to split the predictions. Predictions that are greater than the thresholding value are predicted as positive. This thresholding value, $\tau$, is commonly set to $\tau = 0.5$. While this value works well for multiclass (only 1 label per image) classification where the final layer is typically a softmax layer, it does not work well for a multilabel classifier. Here our final layer is a simple sigmoid layer and as such many labels can (and should) have higher than average activations.  What we would like to do is find an optimal value of $\tau$ such that we maximize both precision and recall. Using Eqn.~\ref{eq:lcard} and~\ref{eq:tau} we calculate the optimal value of $\tau = 0.378$ and record the results in line e of Table~\ref{tab:PRF1}. These results, while not quite as good as the per-image $k$ results, outperform our previous results as well as all the non-ResNet previously published results.
+
+%Is the model robust enough for the problem? Do small perturbations (changes) in training data or the input space greatly affect the results?
+As a final check for robustness, we run an augmented version of our test set through the model by applying random purturbations to each image. We apply up to 10\% zoom, shear, height shifts and width shifts. We also apply up to 10 degree rotation as well as horizontal flipping. We do the robustness test using per-image $k$ method and record the results in Table~\ref{tab:PRF1} line d. Even with distorted data, The model still performs very well only decreasing slightly in precision and recall.
+
+%Can results found from the model be trusted?
+The results from our model can be trusted for the most part. However, newer, more innovative network architectures such as region proposal networks and RNN's have been shown to be more trustworthy.
+
+%\subsection{Justification}
+%In this section, your model’s final solution and its results should be compared to the benchmark you established earlier in the project using some type of statistical analysis. You should also justify whether these results and the solution are significant enough to have solved the problem posed in the project. Questions to ask yourself when writing this section:
+
+%Are the final results found stronger than the benchmark result reported earlier?
+
+%Have you thoroughly analyzed and discussed the final solution?
+
+%Is the final solution significant enough to have solved the problem?
 
 
 \section{Conclusion} % approx. 1-2 pages
 \subsection{Free-Form Visualization}
-In this section, you will need to provide some form of visualization that emphasizes an important quality about the project. It is much more free-form, but should reasonably support a significant result or characteristic about the problem that you want to discuss. Questions to ask yourself when writing this section:
+%In this section, you will need to provide some form of visualization that emphasizes an important quality about the project. It is much more free-form, but should reasonably support a significant result or characteristic about the problem that you want to discuss. Questions to ask yourself when writing this section:
 
-Have you visualized a relevant or important quality about the problem, dataset, input data, or results?
+%Have you visualized a relevant or important quality about the problem, dataset, input data, or results?
+%One aspect of our study was that we had a hard time overfitting our models. The case of overfitting usually manifests itself in a loss vs epoch plot where the training loss decays exponentially and slowly flattens out but the validation loss begins to get worse at some point.  What we observed in most of our training runs were the training data decreasing continuously and the validation loss flattening out.  We used early stopping to send the signal to tell the training when to stop, but this is predicated on the fact that the definition of overfitting more closely resembles that of Fig.~\ref{fig:typical_overfit}.  
 
-Is the visualization thoroughly analyzed and discussed?
+%Is the visualization thoroughly analyzed and discussed? If a plot is provided, are the axes, title, and datum clearly defined?
+%Need 2 plots. one for typical loss/epoch overfitting and one with ours.
 
-If a plot is provided, are the axes, title, and datum clearly defined?
+\begin{figure*}%[!t]
+\subfloat[][]{
+\label{fig:3179}
+\includegraphics[width=0.24\linewidth]{coco_valid_3179.png}}
+\subfloat[][]{
+\label{fig:608}
+\includegraphics[width=0.24\linewidth]{coco_valid_608.png}}
+\subfloat[][]{
+\label{fig:483}
+\includegraphics[width=0.24\linewidth]{coco_valid_483.png}}
+\subfloat[][]{
+\label{fig:2934}
+\includegraphics[width=0.24\linewidth]{coco_valid_2934.png}}
+\caption{Sample images from COCO. See Tables~\ref{tab:3179},~\ref{tab:608},~\ref{tab:483}, and~\ref{tab:2934} for corresponding predictions and ground truth.}
+\label{fig:coco_valid}
+\vspace*{4pt}
+\end{figure*}
 
+In this section, we show some images from the MS-COCO dataset in Fig.~\ref{fig:coco_valid} and the corresponding annotations and predictions in Tables~\ref{tab:3179},~\ref{tab:608},~\ref{tab:483}, and~\ref{tab:2934}.
+
+
+\begin{table}
+\caption{Ranked predictions from our model for Fig.~\ref{fig:3179}. Ground truth labels are highlighted in bold.}
+\label{tab:3179}
+\centering
+\begin{tabular}{cll}
+\toprule
+rank &               label & pred \\
+\midrule
+1 & \textbf{tennis racket} & 0.999998 \\
+2 &        \textbf{person} & 0.999997 \\
+3 &   \textbf{sports ball} & 0.812335 \\
+4 &           \textbf{car} & 0.020007 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\caption{Ranked predictions from our model for Fig.~\ref{fig:608}. Ground truth labels are highlighted in bold.}
+\label{tab:608}
+\centering
+\begin{tabular}{cll}
+\toprule
+rank &              label & pred \\
+\midrule
+1 &        \textbf{pizza} & 0.999812 \\
+2 & \textbf{dining table} & 0.988854 \\
+3 &        \textbf{chair} & 0.906406 \\
+4 &       \textbf{bottle} & 0.886304 \\
+5 &          \textbf{cup} & 0.870188 \\
+6 &       \textbf{person} & 0.861678 \\
+7 &                 knife & 0.810537 \\
+9 &   \textbf{wine glass} & 0.544246 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\caption{Ranked predictions from our model for Fig.~\ref{fig:483}. Ground truth labels are highlighted in bold.}
+\label{tab:483}
+\centering
+\begin{tabular}{cll}
+\toprule
+rank &         label & pred \\
+\midrule
+1 &  \textbf{person} & 0.999982 \\
+2 &     \textbf{tie} & 0.933960 \\
+3 &       cell phone & 0.667491 \\
+4 & \textbf{handbag} & 0.470924 \\
+8 &     \textbf{car} & 0.058415 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\caption{Ranked predictions from our model for Fig.~\ref{fig:2934}. Ground truth labels are highlighted in bold.}
+\label{tab:2934}
+\centering
+\begin{tabular}{cll}
+\toprule
+rank &           label & pred \\
+\midrule
+1  &   \textbf{person} & 0.977053 \\
+2  &      \textbf{car} & 0.895205 \\
+3  &      \textbf{dog} & 0.774094 \\
+4  &  \textbf{bicycle} & 0.588372 \\
+5  &     traffic light & 0.514701 \\
+6  &           handbag & 0.388943 \\
+8  &    \textbf{truck} & 0.263906 \\
+10 & \textbf{backpack} & 0.238688 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Reflection}
 %In this section, you will summarize the entire end-to-end problem solution and discuss one or two particular aspects of the project you found interesting or difficult. You are expected to reflect on the project as a whole to show that you have a firm understanding of the entire process employed in your work. Questions to ask yourself when writing this section:
@@ -1443,7 +1555,7 @@ We explored a wide range of hyperparameters and while some of them were presente
 % \cite yolo and faster-rcnn and cnn-rnn and resnet-SRN
 
 \subsection{Improvement}
-In this section, you will need to provide discussion as to how one aspect of the implementation you designed could be improved. As an example, consider ways your implementation can be made more general, and what would need to be modified. You do not need to make this improvement, but the potential solutions resulting from these changes are considered and compared/contrasted to your current solution. Questions to ask yourself when writing this section:
+%In this section, you will need to provide discussion as to how one aspect of the implementation you designed could be improved. As an example, consider ways your implementation can be made more general, and what would need to be modified. You do not need to make this improvement, but the potential solutions resulting from these changes are considered and compared/contrasted to your current solution. Questions to ask yourself when writing this section:
 
 % Are there further improvements that could be made on the algorithms or techniques you used in this project?
 
