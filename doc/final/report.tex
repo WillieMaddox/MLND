@@ -582,7 +582,7 @@ affiliated with an academic institution.\protect\\
 % note need leading \protect in front of \\ to get a newline within \thanks as
 % \\ is fragile and will error, could use \hfil\break instead.
 }% <-this % stops an unwanted space
-\thanks{Manuscript received November 21, 2017; revised November 26, 2017.}}
+\thanks{Manuscript received December 21, 2017; revised December 26, 2017.}}
 
 % note the % following the last \IEEEmembership and also \thanks - 
 % these prevent an unwanted space from occurring between the last author name
@@ -603,7 +603,7 @@ affiliated with an academic institution.\protect\\
 % space somehow managed to creep in.
 
 % The paper headers
-\markboth{Journal of \LaTeX\ Class Files,~Vol.~11, No.~4, November~2017}%
+\markboth{Journal of \LaTeX\ Class Files,~Vol.~12, No.~4, December~2017}%
 {Maddox \MakeLowercase{\textit{et al.}}: Multi-Label Classification}
 % The only time the second header will appear is for the odd numbered pages
 % after the title page when using the twoside option.
@@ -635,14 +635,14 @@ affiliated with an academic institution.\protect\\
 % command as these need to go into the title area created by \maketitle.
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
-\IEEEtitleabstractindextext{%
+\IEEEtitleabstractindextext{
 \begin{abstract}
-Machine Learning Engineer Nanodegree Capstone Project
+Image classification is one of the most interesting and challenging tasks in computer vision. While most of the work in this area has focused on single-label image classification where each image has only one class label, it is important to remember that real world images typically have multiple labels. The standard method for solving multi-label image classification is to train multiple independent classifiers, one for each category, and apply thresholding or ranking across the classification results. This method works well but fails to capture the strong co-occurrence dependencies of labels on an image. Deep Neural Networks have great potential to capture these types of label relationships and ultimately boost the overall performance of a classifier. In this work we will attempt to build such a classifier and compare our results to the latest models. The purpose of this project is not to present original research but rather to demonstrate a working knowledge of Machine Learning algorithms and techniques.    
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Deep Learning, Machine Learning, Neural Networks, Keras, Tensorflow, VGG16, MS-COCO, NUS-WIDE.
+Machine Learning, Deep Learning, Transfer Learning, Neural Networks, Keras, Tensorflow, VGG16, MS-COCO.
 \end{IEEEkeywords}}
 
 % make the title area
@@ -707,16 +707,25 @@ Deep Learning, Machine Learning, Neural Networks, Keras, Tensorflow, VGG16, MS-C
 % 
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
-\IEEEPARstart{T}{his} demo file is intended to serve as a ``starter file''
-for IEEE Computer Society journal papers produced under \LaTeX\ using
-IEEEtran.cls version 1.8 and later.
+%\IEEEPARstart{T}{his} demo file is intended to serve as a ``starter file''
+%for IEEE Computer Society journal papers produced under \LaTeX\ using
+%IEEEtran.cls version 1.8 and later.
 % You must have at least 2 lines in the paragraph with the drop letter
 % (should never be an issue)
-I wish you the best of success.
+%I wish you the best of success.
 
-\hfill mds
+%\hfill mds
  
-\hfill December 27, 2012
+%\hfill December 27, 2012
+
+\IEEEPARstart{I}{n} machine learning, image classification is the problem of deciding to which category a particular image belongs or to which categories objects in an image belong. Traditional classifiers, such as binary and multi-class classifiers return as output only one value, the prediction, whereas multilabel classifiers produce a vector of output values. Much of the previous work for solving image classification problems has been focused on using a single label per image to train a classifier.  For some of the more popular datasets such as ImageNet~\cite{ILSVRC15} and CIFAR-10~\cite{Krizhevsky2009}, each image has associated with it a single label and there are many images per label. This works well for a dataset like MNIST~\cite{mnist} where each instance is a black and white image of a single handwritten digit between 0 and 9.  But for images that illustrate the real world such as photographs, there is almost never a single contextual topic in the image. For example, Fig.\ref{screw-1924174_640} is a picture of bolts, but there are also nuts, washers and a wooden table.  So in reality this image has (at least) four tags.  The goal of this project is to create a multi-label classifier that can be trained using images that have multiple labels per image.
+
+\begin{figure}
+	\includegraphics[width=\linewidth]{screw-1924174_640.jpg} % Figure image
+	\caption{Nuts n Bolts} % Figure caption
+	\label{screw-1924174_640} % Label for referencing with \ref{bear}
+\end{figure}
+
 
 %\subsection{Subsection Heading Here}
 %Subsection text here.
@@ -817,21 +826,12 @@ I wish you the best of success.
 
 
 \section{Definition} % approx. 1-2 pages
-\subsection{Project Overview}
+%\subsection{Project Overview}
 %In this section, look to provide a high-level overview of the project in layman’s terms. Questions to ask yourself when writing this section:
 
 %Has an overview of the project been provided, such as the problem domain, project origin, and related datasets or input data?
 
 %Has enough background information been given so that an uninformed reader would understand the problem domain and following problem statement?
-
-In machine learning, image classification is the problem of deciding to which category a particular image belongs or to which categories objects in an image belong. Traditional classifiers, such as binary and multi-class classifiers return as output only one value, the prediction, whereas multilabel classifiers produce a vector of output values. Much of the previous work for solving image classification problems has been focused on using a single label per image to train a classifier.  For some of the more popular datasets such as ImageNet~\cite{ILSVRC15} and CIFAR-10~\cite{Krizhevsky2009}, each image has associated with it a single label and there are many images per label. This works well for a dataset like MNIST~\cite{mnist} where each instance is a black and white image of a single handwritten digit between 0 and 9.  But for images that illustrate the real world such as photographs, there is almost never a single contextual topic in the image. For example, Fig.\ref{screw-1924174_640} is a picture of bolts, but there are also nuts, washers and a wooden table.  So in reality this image has (at least) four tags.  The goal of this project is to create a multi-label classifier that can be trained using images that have multiple labels per image.
-
-\begin{figure}
-	\includegraphics[width=\linewidth]{screw-1924174_640.jpg} % Figure image
-	\caption{Nuts n Bolts} % Figure caption
-	\label{screw-1924174_640} % Label for referencing with \ref{bear}
-\end{figure}
-
 
 \subsection{Problem Statement}
 %In this section, you will want to clearly define the problem that you are trying to solve, including the strategy (outline of tasks) you will use to achieve the desired solution. You should also thoroughly discuss what the intended solution will be for this problem. Questions to ask yourself when writing this section:
@@ -1221,7 +1221,7 @@ Once the optimal Stage 1 hyper-parameters are found then we can proceed to Stage
 %Is the process of improvement clearly documented, such as what techniques were used?
 %Are intermediate and final solutions clearly reported as the process is improved?
 
-At this point we would like to refine our model by tuning some of the Stage 1 hyper-parameters.  We begin by defining some rules for how we will format our log and top model weights filenames\footnote{Logs will be saved as csv's and the weights will be saved in hdf format using the hdf5 extension. The files can be found from the root of the project directory in data/bottleneck\_top\_models.}. This is best explained with a simple example. Consider the following string, "coco\_2017\_zmuv\_avg\_1x2048d5\_lr11\_b32". The first field, "coco", refers to the name of the dataset and "2017" is the subset (or version) of the dataset. The other fields follow directly from Table~\ref{tab:hyperparams}. "ZMUV" indicates zero-mean unit-variance scaling was used to normalize the input images. The $4^{th}$ field, "avg" denotes the use of global average pooling on the final layer of the base VGG16 model. This also describes the shape of the input to the top model. The next term, "1x2048d5" is a combination of 3 hyper-parameters that describe the fully connected layers in the top model. The "1x2048" indicates that there is 1 hidden layer and that it has "2048" nodes.  All fully connected layers are immediately followed by a ReLU activation layer which is then followed by either a dropout ("d") layer or a batch normalization ("bn") layer. For dropout, the number after the "d" indicates the percentage of nodes that get dropped. So "d3" would mean that only 30\% of the nodes are dropped. The second to last field gives information about the learning rate in the form "lrXY" which should be interpreted as $\mathrm{lr = X * 10^{-Y}}$.  So, lr53 would indicate a learning rate of 0.005, lr11 would be 0.1, and so forth. The final field, "b32" denotes the batch size.
+At this point we would like to refine our model by tuning some of the Stage 1 hyper-parameters.  We begin by defining some rules for how we will format our log and top model weights filenames\footnote{Logs are saved in csv format using the csv extension and weights are saved in hdf format using the hdf5 extension. The files can be found from the root of the project directory in data/bottleneck\_top\_models.}. This is best explained with a simple example. Consider the following string, "coco\_2017\_zmuv\_avg\_1x2048d5\_lr11\_b32". The first field, "coco", refers to the name of the dataset and "2017" is the subset (or version) of the dataset. The other fields follow directly from Table~\ref{tab:hyperparams}. "ZMUV" indicates zero-mean unit-variance scaling was used to normalize the input images. The $4^{th}$ field, "avg" denotes the use of global average pooling on the final layer of the base VGG16 model. This also describes the shape of the input to the top model. The next term, "1x2048d5" is a combination of 3 hyper-parameters that describe the fully connected layers in the top model. The "1x2048" indicates that there is 1 hidden layer and that it has "2048" nodes.  All fully connected layers are immediately followed by a ReLU activation layer which is then followed by either a dropout ("d") layer or a batch normalization ("bn") layer. For dropout, the number after the "d" indicates the percentage of nodes that get dropped. So "d3" would mean that only 30\% of the nodes are dropped. The second to last field gives information about the learning rate in the form "lrXY" which should be interpreted as $\mathrm{lr = X * 10^{-Y}}$.  So, lr53 would indicate a learning rate of 0.005, lr11 would be 0.1, and so forth. The final field, "b32" denotes the batch size.
 
 The first hyper-parameter we looked at was the method for image preprocessing. We compared the results between each method by looking at how they compared for each of the different classifier designs. In all cases, the ZMUV preprocessing method led to lower validation losses as seen in Fig.~\ref{fig:top_pp_pl_lve}. We also looked at how well the different classifier designs compared to each other. Looking again at Fig.~\ref{fig:top_pp_pl_lve} we can see that the 77 design performed much worse than the global max and global average pooling designs. To determine whether global max or global average pooling is better, we compare them against different layer sizes as shown in Fig.~\ref{fig:top_pl_sz_lve}. In all three cases the validation loss was lower when using global average pooling. In light of these preliminary results we will restrict the remaining hyper-parameter tuning calculations to using only ZMUV to preprocess the images and global average pooling to cap off the end of the VGG16 pretrained model. A consequence of transfer learning is that the input shape of our top model will need to match the output shape of our base model. With global average pooling, this simplifies the input shape from $512\times7\times7$ features to $512\times1\times1$ features. This will greatly reduce the training time of our top model classifier and enable faster progress while we tune the remaining hyper-parameters.
 
